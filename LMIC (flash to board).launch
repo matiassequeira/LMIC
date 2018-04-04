@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.intel.iss.mcu.openocd.launchConfigurationType">
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="set remotetimeout 50&#10;monitor clk32M&#10;monitor gdb_breakpoint_override hard&#10;flushregs"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.loadSymbols" value="true"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.pcRegister" value=""/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.runCommands" value="monitor reset halt&#10;flushregs&#10;tbreak main&#10;continue"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.setPcRegister" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.setResume" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.setStopAt" value="false"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.stopAt" value=""/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForImage" value="true"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.debug.org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForSymbols" value="true"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="set remotetimeout 50&#10;monitor clk32M&#10;monitor gdb_breakpoint_override hard&#10;flushregs"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.loadSymbols" value="true"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.pcRegister" value=""/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.runCommands" value="monitor reset"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.setPcRegister" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.setResume" value="false"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.setStopAt" value="false"/>
+<stringAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.stopAt" value=""/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForImage" value="true"/>
+<booleanAttribute key="com.intel.iss.mcu.ide.mode.run.org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForSymbols" value="true"/>
+<stringAttribute key="com.intel.iss.mcu.openocd.configuration" value="-f scripts/board/quark_d2000_onboard.cfg"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="set remotetimeout 50&#10;monitor clk32M&#10;monitor gdb_breakpoint_override hard&#10;flushregs"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.jtagDevice" value="Generic TCP/IP"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadSymbols" value="true"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.pcRegister" value=""/>
+<intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.portNumber" value="3333"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.runCommands" value="monitor reset"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setPcRegister" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setResume" value="false"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setStopAt" value="false"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.stopAt" value=""/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForImage" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForSymbols" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useRemoteTarget" value="true"/>
+<stringAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_NAME" value="${env_var:ISSM_GDB_IA_BIN}"/>
+<intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="1"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="${qmsi_build_type:LMIC}\quark_d2000\x86\obj\LMIC.elf"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="LMIC"/>
+<booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value=""/>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+</launchConfiguration>

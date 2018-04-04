@@ -1,0 +1,38 @@
+import "nanopb.proto";
+
+package esl;
+
+// (uint8_t message id) (varint length)  (message)
+
+enum MsgType {
+	RESERVED = 0;
+	HELLO = 1;
+	DISCOVER = 2;
+	VALUE_UPDATE = 3;
+}
+
+enum Type {
+    BOOL = 3;
+    INT = 4;
+    FLOAT = 5;
+}
+
+message Hello {
+//	option (nanopb_msgopt).msgid = 1;
+	optional bytes hwid = 1 [(nanopb).max_size = 16]; 
+	optional uint32 sensor_count = 2;
+}
+
+message Discover {
+//	option (nanopb_msgopt).msgid = 2;
+	optional uint32 id = 1;
+	optional bytes serial = 2 [(nanopb).max_size = 32];
+}
+
+message ValueUpdate {
+//	option (nanopb_msgopt).msgid = 3;
+	required uint32 id = 1;
+	optional bool bool_val = 3;
+	optional int32 int_val = 4;
+	optional float float_val = 5;
+}

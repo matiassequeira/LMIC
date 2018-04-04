@@ -1,0 +1,1184 @@
+[
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example app will trigger an interrupt when push button 0 is pressed and prints the callback status to the screen.",
+            "name": "Always On (AON) General-Purpose Input/Output (GPIO)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "aon_gpio"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This example demonstrates the sensor subsystem core states.",
+            "name": "Sensor Subsystem (SS) Power Core",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/power_core"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This example uses a Microchip 24FC256-I/P I2C EEPROM to demonstrate both polled and interrupt based master I2C transfers on I2C_SS_0.",
+            "name": "Sensor Subsystem (SS) Inter-Integrated Circuit (I2C)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/i2c"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This application must run in conjunction with its Host counterpart located in ./examples/quark_se/power_lpss/. Refer to the host application for the board setup.",
+            "name": "Sensor Subsystem (SS) Low Power Sensing Standby (LPSS) State",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/power_lpss"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This application configures the ARC to be ready for LPSS. LPSS will be enabled by a state transition to C2/C2LP from the x86 core after this application has executed on ARC.",
+            "name": "Sensor Subsystem (SS) Low Power Sensing Standby (LPSS) State",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/configure_lpss"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This example uses the sensor subsystem SPI block 0 to read the CHIPID of the on-board BMI160 by using polled mode and interrupts.",
+            "name": "Sensor Subsystem (SS) Serial Peripheral Interface (SPI)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/spi"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This application demonstrates the basic functionality of the ADC driver for the Sensor Subsystem using Polling and Interrupt based methods.",
+            "name": "Sensor Subsystem (SS) Analog-to-Digital Converter (ADC)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/adc"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This app demonstrates the basic usage of the QMSI SS GPIO API.",
+            "name": "Sensor Subsystem (SS) General-Purpose Input/Output (GPIO)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/gpio"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This application demonstrates how to extend QMSI's ADC driver to use it in continuous convert mode for the Sensor Subsystem. The application makes use of a Ring Buffer to store data from the ADC.",
+            "name": "Sensor Subsystem (SS) Analog-to-Digital Converter (ADC) Continuous Conversion",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/adc_continuous"
+    },
+    {
+        "example": {
+            "category": "Sensor Subsystem Drivers",
+            "description": "This app configures a timer to expire every 0.5 seconds, at which point the callback function will be invoked to increase the count and a message is printed to the console.",
+            "name": "Sensor Subsystem (SS) Timer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/timer"
+    },
+    {
+        "example": {
+            "category": "Developer Board Sensors",
+            "description": "This application will read the gyro data from the onboard sensor on the Intel(R) Quark(TM) SE development platform and print it to the console every 125 milliseconds. The app will complete once it has read 500 samples.",
+            "name": "Sensor Subsystem (SS) Gyroscope",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/gyro"
+    },
+    {
+        "example": {
+            "category": "Applications",
+            "description": "This application contains both a Sensor Subsystem GPIO interrupt driven example and SW driven common interrupt example.",
+            "name": "Sensor Subsystem (SS) Interrupt",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    }
+                ]
+            }
+        },
+        "path": "sensor/interrupt"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example uses a Microchip 24FC256-I/P I2C EEPROM to demonstrate both polled, interrupt and DMA based master I2C transfers on I2C_0.",
+            "name": "Inter-Integrated Circuit (I2C)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "i2c"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example sets up the FPR violation policy with a callback. It then uses an FPR to lock read on the flash and then try to read which should trigger the violation.",
+            "name": "Flash Protection Region (FPR)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "fpr"
+    },
+    {
+        "example": {
+            "category": "Applications",
+            "description": "This example describes how to use AES CTR crypto and HMAC SHA256 digest calculation.",
+            "name": "Tinycrypt Crypto",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "crypto"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app sets up a PIC timer to fire every 0.125 seconds which results in the callback function being invoked. The app disables the timer once there has been 5 callbacks.",
+            "name": "Programmable Interrupt Controller (PIC) Timer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "pic_timer"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example app prints the QMSI API and ROM version over stdout.",
+            "name": "Version",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "version"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the UART functionality on Intel(R) Quark(TM) development platforms.",
+            "name": "Universal Asynchronous Receiver/Transmitter (UART)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "uart"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the basic functionality of the PWM timers by setting a timer which triggers a callback function when it expires.",
+            "name": "Timer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "timers"
+    },
+    {
+        "example": {
+            "description": "This app will blink an LED on the development platform indefinitely.",
+            "name": "LED_Blink",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "blinky"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example uses an MPR to protect a 1kB page of SRAM and then attempts to write to that region which will trigger an MPR violation interrupt.",
+            "name": "Memory Protection Region (MPR)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "mpr"
+    },
+    {
+        "example": {
+            "category": "Applications",
+            "description": "This app demonstrates the usage of qm_soc_reset().",
+            "name": "Reset",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "reset"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This example demonstrates C1, C2 and C2LP core states.",
+            "name": "Quark SE C1000 Power Core",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/power_core"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This application must run in conjunction with its Sensor Subsystem counterpart located in examples/sensor/power_lpss/.",
+            "name": "Low Power Sensing Standby (LPSS) State",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/power_lpss"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example app is exclusive to the Intel(R) Quark(TM) SE SoC. This app shows how to implement a multicore sleep synchronization procedure.",
+            "name": "Sleep multicore",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/sleep_multicore"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This example demonstrates voltage regulator states.",
+            "name": "Voltage Regulator",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/vreg"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example app is exclusive to the Intel(R) Quark(TM) SE SoC. This app shows the use of mailboxes with interrupts. The sensor subsystem echoes back all messages sent by the x86 processor.",
+            "name": "Mailbox",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/mailbox"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This application must run in conjonction with its Sensor Subsystem counterpart located in examples/sensor/configure_lpss/.",
+            "name": "Configure Low Power Sensing Standby (LPSS) State",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/configure_lpss"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the basic usage of the QMSI USB API through the implementation of the DFU Device Class. Only runtime mode from DFU is implemented.",
+            "name": "USB Device Firmware Update (DFU) Device Class",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/usb_dfu"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This application demonstrates SE C1000 Power states. States executed in this example are SLEEP, DEEP_SLEEP and ADVANCED_SLEEP.",
+            "name": "Quark SE C1000 Power SoC",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/power_soc"
+    },
+    {
+        "example": {
+            "category": "Applications",
+            "description": "This example exemplifies how x86 applications may start ARC execution.",
+            "name": "Start the ARC Running.",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/start_arc"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the basic usage of the QMSI USB API through the implementation of a serial console over USB through the CDC-ACM Device Class.",
+            "name": "USB Communication Device Class (Abstract Control Model)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_se/usb_cdc_acm"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the basic functionality of the QMSI DMA API by doing a memory to memory copy.",
+            "name": "Memory to Memory Direct Memory Access (DMA) Transfer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "dma"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the use of the flash controller.",
+            "name": "Flash Access",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "flash_access"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app sets up RTC to fire an interrupt every quarter second which results in the callback function being invoked. The app disables the RTC once there have been 5 callbacks.",
+            "name": "Real Time Clock (RTC)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "rtc"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app sets up comparator 0 to fire an interrupt when the input voltage on the pin is greater than the internal reference voltage (0.95V)",
+            "name": "Comparator",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "comparators"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This app demonstrates how SoCWatch profiles enter different power modes on the Intel(R) Quark(TM) development platforms.",
+            "name": "Power Profiler",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "power_profiler"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example uses the SPI loopback mode to demonstrate setting up and executing polled, IRQ and DMA based transfers on SPI master 0.",
+            "name": "Serial Peripheral Interface (SPI) loopback",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "spi"
+    },
+    {
+        "example": {
+            "category": "Developer Board Sensors",
+            "description": "This app will read the accelerometer data from the onboard BMC150/160 sensor and print it to the console every 125 milliseconds. The app will complete once it has read 500 samples.",
+            "name": "Accelerometer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "accel"
+    },
+    {
+        "example": {
+            "category": "Grove Shield Examples",
+            "description": "This sample application measures the angular velocity using Grove digital gyro sensor v1.3 ITG-3200 on the Intel(R) Quark(TM) SE and Quark(TM) D2000 development platforms.",
+            "name": "Grove Shield 3 Axis Digital Gyro",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "shields/grove/3_axis_digital_gyro"
+    },
+    {
+        "example": {
+            "category": "Grove Shield Examples",
+            "description": "This example requires the BASE SHIELD(v2) by Seeed Studio and the HDC1000 sensor from TI. The BASE SHIELD(v2) is Arduino compatible, and so can be attached to the Quark Microcontroller D2000 and SE Development Platforms.",
+            "name": "Grove Shield Temperature/Humidity Sensor",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "shields/grove/temperature_humidity_sensor"
+    },
+    {
+        "example": {
+            "category": "Grove Shield Examples",
+            "description": "This application works with shield and Grove electricity sensor TA12-200. The example assumes that the sensor is connected to A0 on Grove shield.",
+            "name": "Grove Shield Electricity Sensor",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "shields/grove/electricity_sensor"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app prints a message, then runs a few tests with conditional IRQ locking / unlocking mechanism and return. A failure or success message will be printed in the end accordingly.",
+            "name": "Interrupt Request (IRQ) Lock / Unlock",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "irq_lock"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example simulates an I2C EEPROM to demonstrate how to use I2C slave API. This application uses Microchip 24FC256-I/P I2C EEPROM's protocol. You can use I2C example for the master I2C for reading/writing into this simulated EEPROM. After 6 transfers, this application will stop.",
+            "name": "Inter-Integrated Circuit (I2C) Slave EEPROM Simulation",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "i2c_slave"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example application demonstrates the PWM functionality on the Intel(R) Quark(TM) development platforms.",
+            "name": "Pulse Width Modulation (PWM)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "pwm"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates changing the system clock speed.",
+            "name": "Clock Divisor",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "clk_div"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app is intended to demonstrate the basic usage of the QMSI GPIO API.",
+            "name": "General Purpose Input/Output (GPIO)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "gpio"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app sets up a watchdog timer to fire every 4.096ms which results in the callback function being invoked and restarts the WDT.",
+            "name": "Watchdog timer (WDT)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "wdt"
+    },
+    {
+        "example": {
+            "category": "Developer Board Sensors",
+            "description": "This application will read the magneto data from the onboard sensor on the Intel(R) Quark(TM) D2000 development platform and print it to the console every 125 milliseconds. The app will complete once it has read 500 samples.",
+            "name": "Magnetometer",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_d2000/magneto"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app demonstrates the basic functionality of the QMSI ADC API. It shows the two main modes of operation; polled mode (blocking, up to 32 samples per conversion) and IRQ mode (non-blocking, any number of samples).",
+            "name": "Analog-to-Digital Converter (ADC)",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_d2000/adc"
+    },
+    {
+        "example": {
+            "category": "Power",
+            "description": "This app demonstrates the power functions of the Intel(R) Quark(TM) D2000 SoC.  *",
+            "name": "Quark D2000 Power",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_d2000/power"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This application demonstrates how to extend QMSI's Analog-to-Digital-Converter (ADC) driver to use it in continuous convert mode by reading data from its FIFO into a ring buffer.",
+            "name": "Quark D2000 Analog-to-Digital Converter (ADC) Continuous Conversion",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "quark_d2000/adc_continuous"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app will print the ID and version of the SoC.",
+            "name": "Identification",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "identification"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This app first reads the value of the counter and prints it. It then configures the periodic timer to fire a number of times resulting in the callback function being invoked. Finally it prints the number of times the callback was invoked.",
+            "name": "Always-on (AON) Counters",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "aon_counters"
+    },
+    {
+        "example": {
+            "description": "This app prints a \"hello, world\" message to the screen.",
+            "name": "Hello World",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "hello_world"
+    },
+    {
+        "example": {
+            "category": "Applications",
+            "description": "Very simple app demonstrating the usage of QM_PUTS, QM_PRINTF, QM_ASSERT, pico_printf, printf, malloc and free.",
+            "name": "CLib Functions",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "clib"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example simulates R/W access to a SPI EEPROM,",
+            "name": "QMSI SPI eeprom emulation.",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "spi_slave/spi_eeprom_slave"
+    },
+    {
+        "example": {
+            "category": "Drivers",
+            "description": "This example should be used together with spi_eeprom_slave, which has to be flashed on 2 differents board and connected via SPI port. spi_eeprom_slave simulate a spi eeprom to demonstrate how to use spi slave API. This application will send some data to the eeprom, and then will read them back.",
+            "name": "QMSI SPI eeprom master",
+            "platform": {
+                "configurations": [
+                    {
+                        "soc": "quark_se",
+                        "target": "sensor"
+                    },
+                    {
+                        "soc": "quark_se",
+                        "target": "x86"
+                    },
+                    {
+                        "soc": "quark_d2000",
+                        "target": "x86"
+                    }
+                ]
+            }
+        },
+        "path": "spi_slave/spi_eeprom_master"
+    }
+]

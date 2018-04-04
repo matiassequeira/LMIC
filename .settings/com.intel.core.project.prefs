@@ -1,0 +1,12 @@
+com.intel.core.platform.selected.id=quark_d2000_devboard
+com.intel.core.project.name=LMIC
+com.intel.core.project.type.id=com.intel.iss.mcu.ide.nature
+com.intel.core.project.version=4.5.0
+eclipse.preferences.version=1
+platform/build.toolchain_id=com.intel.iss.mcu.toolChain.gcc.a.debug
+platform/connection.configuration=-f scripts/board/quark_d2000_onboard.cfg
+platform/connection.port=3333
+platform/core.name=Quark
+platform/issm.core.id=quark
+platform/issm.soc.id=quark_d2000
+platform/os=firmware_qmsi\:1.4.0

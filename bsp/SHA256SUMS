@@ -1,0 +1,3 @@
+99dfefce799a089700d477b4e83c32cee82689f3117e8d59b078098cf30e97ab  soc/quark_d2000/rom/quark_d2000_rom_fm_hmac.bin
+6ebf27fd091a5bb8cdde2f3391a650101c93ecf2af239af0d723a9356edb7b6e  soc/quark_se/rom/quark_se_rom_fm_hmac.bin
+97db9fc5763f8a7718d58394634e1a2fad9a4699cb5d9a6fdb7466acd1226e84  soc/quark_se/rom/quark_se_rom_fm_2nd_stage.bin

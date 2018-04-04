@@ -1,0 +1,6 @@
+debug
+release
+*.elf
+*.bin
+*.o
+

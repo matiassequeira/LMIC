@@ -1,5 +1,4 @@
-LMIC porting for Quark D2000
-
+LMIC Port for LoRa platforms with Intel Quark D2000 Microcontroller
 
 Gateway stress test
 

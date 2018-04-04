@@ -27,19 +27,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-DEFAULT_SOC = quark_d2000
-DEFAULT_TARGET = x86
+### Hello world example makefile
 
-SOC ?= $(DEFAULT_SOC)
-TARGET ?= $(DEFAULT_TARGET)
-BUILD ?= debug
+### Variables
+APP_NAME = LMIC
+SOC = quark_d2000
+TARGET = x86
+BASE_DIR := ./bsp
+APP_DIR := .
 
-### Make all Spi Slave apps
-SUBDIRS := $(filter %/, $(wildcard ./*/))
-
-all clean realclean:: $(SUBDIRS)
-
-$(SUBDIRS):
-	$(MAKE) SOC=$(SOC) TARGET=$(TARGET) BUILD=$(BUILD) -C $@ $(MAKECMDGOALS)
-
-.PHONY: $(SUBDIRS)
+### Make includes
+include $(APP_DIR)/app.mk

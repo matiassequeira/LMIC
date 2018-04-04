@@ -42,21 +42,32 @@ enum { LEN_DEVNONCE      =  2 };
 enum { LEN_ARTNONCE      =  3 };
 enum { LEN_NETID         =  3 };
 enum { DELAY_JACC1       =  5 }; // in secs
-enum { DELAY_DNW1        =  1 }; // in secs down window #1
-enum { DELAY_EXTDNW2     =  1 }; // in secs
+/* disable for GPS stress test */
+enum { DELAY_DNW1        =  0 }; // in secs down window #1
+//enum { DELAY_DNW1        =  1 }; // in secs down window #1
+enum { DELAY_EXTDNW2     =  0 }; // in secs
+//enum { DELAY_EXTDNW2     =  1 }; // in secs
 enum { DELAY_JACC2       =  DELAY_JACC1+(int)DELAY_EXTDNW2 }; // in secs
 enum { DELAY_DNW2        =  DELAY_DNW1 +(int)DELAY_EXTDNW2 }; // in secs down window #1
 enum { BCN_INTV_exp      = 7 };
 enum { BCN_INTV_sec      = 1<<BCN_INTV_exp };
 enum { BCN_INTV_ms       = BCN_INTV_sec*1000L };
 enum { BCN_INTV_us       = BCN_INTV_ms*1000L };
-enum { BCN_RESERVE_ms    = 2120 };   // space reserved for beacon and NWK management
-enum { BCN_GUARD_ms      = 3000 };   // end of beacon period to prevent interference with beacon
-enum { BCN_SLOT_SPAN_ms  =   30 };   // 2^12 reception slots a this span
-enum { BCN_WINDOW_ms     = BCN_INTV_ms-(int)BCN_GUARD_ms-(int)BCN_RESERVE_ms };
-enum { BCN_RESERVE_us    = 2120000 };
-enum { BCN_GUARD_us      = 3000000 };
-enum { BCN_SLOT_SPAN_us  =   30000 };
+/* disable for GPS stress test */
+enum { BCN_RESERVE_ms    = 0 };   // space reserved for beacon and NWK management
+//enum { BCN_RESERVE_ms    = 2120 };   // space reserved for beacon and NWK management
+enum { BCN_GUARD_ms      = 0 };   // end of beacon period to prevent interference with beacon
+//enum { BCN_GUARD_ms      = 3000 };   // end of beacon period to prevent interference with beacon
+enum { BCN_SLOT_SPAN_ms  =   0 };   // 2^12 reception slots a this span
+//enum { BCN_SLOT_SPAN_ms  =   30 };   // 2^12 reception slots a this span
+enum { BCN_WINDOW_ms     = 0 };
+//enum { BCN_WINDOW_ms     = BCN_INTV_ms-(int)BCN_GUARD_ms-(int)BCN_RESERVE_ms };
+enum { BCN_RESERVE_us    = 0 };
+//enum { BCN_RESERVE_us    = 2120000 };
+enum { BCN_GUARD_us      = 0 };
+//enum { BCN_GUARD_us      = 3000000 };
+enum { BCN_SLOT_SPAN_us  =   0 };
+//enum { BCN_SLOT_SPAN_us  =   30000 };
 
 #if defined(CFG_eu868) // ==============================================
 

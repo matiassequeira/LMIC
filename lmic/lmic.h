@@ -40,8 +40,12 @@ enum { LINK_CHECK_CONT    =  12 ,    // continue with this after reported dead l
 enum { TIME_RESYNC        = 6*128 }; // secs
 enum { TXRX_GUARD_ms      =  6000 };  // msecs - don't start TX-RX transaction before beacon
 enum { JOIN_GUARD_ms      =  9000 };  // msecs - don't start Join Req/Acc transaction before beacon
-enum { TXRX_BCNEXT_secs   =     2 };  // secs - earliest start after beacon time
-enum { RETRY_PERIOD_secs  =     3 };  // secs - random period for retrying a confirmed send
+/* disable Delay for GPS stress test */
+//enum { TXRX_BCNEXT_secs   =     2 };  // secs - earliest start after beacon time
+enum { TXRX_BCNEXT_secs   =     0 };  // secs - earliest start after beacon time
+/* disable Delay for GPS stress test */
+//enum { RETRY_PERIOD_secs  =     3 };  // secs - random period for retrying a confirmed send
+enum { RETRY_PERIOD_secs  =     0 };  // secs - random period for retrying a confirmed send
 
 #if defined(CFG_eu868) // EU868 spectrum ====================================================
 

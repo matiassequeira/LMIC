@@ -27,7 +27,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-### Make all grove examples makefile
+### Make all shields makefile
 
 DEFAULT_SOC = quark_d2000
 DEFAULT_TARGET = x86
@@ -37,13 +37,7 @@ TARGET ?= $(DEFAULT_TARGET)
 BUILD ?= release
 
 SUBDIRS := $(filter %/, $(wildcard ./*/))
-
-ifeq ($(SOC), quark_se)
-ifeq ($(TARGET), x86)
-#### Excluding the non supported modules
-SUBDIRS := $(subst ./electricity_sensor/,,${SUBDIRS})
-endif
-endif
+SUBDIRS := $(filter-out ./include/, ${SUBDIRS})
 
 all clean realclean:: $(SUBDIRS)
 

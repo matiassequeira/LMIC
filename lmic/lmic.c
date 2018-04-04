@@ -38,7 +38,8 @@
 #define DNW2_SAFETY_ZONE       ms2osticks(3000)
 #endif
 #if defined(CFG_us915)
-#define DNW2_SAFETY_ZONE       ms2osticks(750)
+//#define DNW2_SAFETY_ZONE       ms2osticks(750)
+#define DNW2_SAFETY_ZONE       ms2osticks(0)
 #endif
 
 // Special APIs - for development or testing
@@ -467,8 +468,9 @@ static bit_t rxschedNext (xref2rxsched_t rxsched, ostime_t cando) {
 }
 #endif // !DISABLE_PING)
 
-
-static ostime_t rndDelay (u1_t secSpan) {
+/* disabled for GPS stress test*/
+/*
+ static ostime_t rndDelay (u1_t secSpan) {
     u2_t r = os_getRndU2();
     ostime_t delay = r;
     if( delay > OSTICKS_PER_SEC )
@@ -477,16 +479,18 @@ static ostime_t rndDelay (u1_t secSpan) {
         delay += ((u1_t)r % secSpan) * OSTICKS_PER_SEC;
     return delay;
 }
+*/
 
-
-static void txDelay (ostime_t reftime, u1_t secSpan) {
+/* disabled for GPS stress test*/
+/*
+ * static void txDelay (ostime_t reftime, u1_t secSpan) {
     reftime += rndDelay(secSpan);
     if( LMIC.globalDutyRate == 0  ||  (reftime - LMIC.globalDutyAvail) > 0 ) {
         LMIC.globalDutyAvail = reftime;
         LMIC.opmode |= OP_RNDTX;
     }
 }
-
+*/
 #if !defined(DISABLE_JOIN)
 static void setDrJoin (u1_t reason, u1_t dr) {
     EV(drChange, INFO, (e_.reason    = reason,
@@ -1589,7 +1593,8 @@ static void processRx2DnData (xref2osjob_t osjob) {
         // gateay is not listening anyway, delay the next transmission
         // until DNW2_SAFETY_ZONE from now, and add up to 2 seconds of
         // extra randomization.
-        txDelay(os_getTime() + DNW2_SAFETY_ZONE, 2);
+        /* disable txDelay for GPS stress test */
+        //txDelay(os_getTime() + DNW2_SAFETY_ZONE, 2);
     }
     processDnData();
 }
@@ -1902,7 +1907,8 @@ static bit_t processDnData (void) {
                 LMIC.txCnt += 1;
                 setDrTxpow(DRCHG_NOACK, lowerDR(LMIC.datarate, TABLE_GET_U1(DRADJUST, LMIC.txCnt)), KEEP_TXPOW);
                 // Schedule another retransmission
-                txDelay(LMIC.rxtime, RETRY_PERIOD_secs);
+                /* disable txDelay for GPS stress test */
+                //txDelay(LMIC.rxtime, RETRY_PERIOD_secs);
                 LMIC.opmode &= ~OP_TXRXPEND;
                 engineUpdate();
                 return 1;
@@ -1999,7 +2005,8 @@ static void processBeacon (xref2osjob_t osjob) {
         LMIC.bcninfo.time   += BCN_INTV_sec;
         LMIC.missedBcns++;
         // Delay any possible TX after surmised beacon - it's there although we missed it
-        txDelay(LMIC.bcninfo.txtime + BCN_RESERVE_osticks, 4);
+        /* disable txDelay for GPS stress test */
+        //txDelay(LMIC.bcninfo.txtime + BCN_RESERVE_osticks, 4);
         if( LMIC.missedBcns > MAX_MISSED_BCNS )
             LMIC.opmode |= OP_REJOIN;  // try if we can roam to another network
         if( LMIC.bcnRxsyms > MAX_RXSYMS ) {
@@ -2107,7 +2114,8 @@ static void engineUpdate (void) {
 
             // Not enough time to complete TX-RX before beacon - postpone after beacon.
             // In order to avoid clustering of postponed TX right after beacon randomize start!
-            txDelay(rxtime + BCN_RESERVE_osticks, 16);
+            /* disable txDelay for GPS stress test */
+            //txDelay(rxtime + BCN_RESERVE_osticks, 16);
             txbeg = 0;
             goto checkrx;
         }

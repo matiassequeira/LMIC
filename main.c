@@ -1,6 +1,45 @@
+/*
+ * Gateway stress test
+ *
+ * Description: To test the stability of the LoRa gateway a test scenario
+ * with several sensor nodes (AIGSG-PS3) is implemented. Every sensor node
+ * transmits continuously messages to the gateway without pausing. When a
+ * message transmission is completed a new transmission begins. To establish
+ * a maximum message throughput to the gateway without causing collisions on
+ * the medium, the first 8 nodes send on a separate channel each. To examine
+ * the system behavior additional nodes use the full channel spectrum (0-7)
+ * and switch between channels randomly.
+ *
+ * In total the following test cases are realized:
+ * Scenario 1:  1 node on channel 0, 2500 messages with SF7
+ * Scenario 2:  2 nodes on channel 0 and 1 respectively, 2500 messages each with SF7
+ * Scenario 3:  3 nodes on channel 0, 1 and 2 respectively, 2500 messages each with SF7
+ * Scenario 4:  4 nodes on channel 0, 1, 2 and 3 respectively, 2500 messages each with SF7
+ * Scenario 5:  5 nodes on channel 0, 1, 2, 3 and 4 respectively, 2500 messages each with SF7
+ * Scenario 6:  6 nodes on channel 0, 1, 2, 3, 4 and 5 respectively, 2500 messages each with SF7
+ * Scenario 7:  7 nodes on channel 0, 1, 2, 3, 4, 5 and 6 respectively, 2500 messages each with SF7
+ * Scenario 8:  8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 2500 messages each with SF7
+ * Scenario 9:  8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 1 extra node using all channels 0-7, 2500 messages each with SF7
+ * Scenario 10: 8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 2 extra nodes using all channels 0-7,2500 messages each with SF7
+ *
+ * After that the same setup is repeated with SF10:
+ * Scenario 11:  1 node on channel 0, 2500 messages with SF10
+ * Scenario 12:  2 nodes on channel 0 and 1 respectively, 2500 messages each with SF10
+ * Scenario 13:  3 nodes on channel 0, 1 and 2 respectively, 2500 messages each with SF10
+ * Scenario 14:  4 nodes on channel 0, 1, 2 and 3 respectively, 2500 messages each with SF10
+ * Scenario 15:  5 nodes on channel 0, 1, 2, 3 and 4 respectively, 2500 messages each with SF10
+ * Scenario 16:  6 nodes on channel 0, 1, 2, 3, 4 and 5 respectively, 2500 messages each with SF10
+ * Scenario 17:  7 nodes on channel 0, 1, 2, 3, 4, 5 and 6 respectively, 2500 messages each with SF10
+ * Scenario 18:  8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 2500 messages each with SF10
+ * Scenario 19:  8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 1 extra node using all channels 0-7, 2500 messages each with SF10
+ * Scenario 20: 8 nodes on channel 0, 1, 2, 3, 4, 5, 6 and 7 respectively, 2 extra nodes using all channels 0-7,2500 messages each with SF10
+ *
+ * Author: Sebastian Scheibe
+ * Date: 2018-03-28
+ *
+ */
+
 #define ABP
-#define I2C
-#define ADS1115
 
 #include <qm_pinmux.h>
 #include <qm_i2c.h>
@@ -13,32 +52,27 @@
 #include "pb_decode.h"
 #include "eslight/protocol.h"
 
-#ifdef I2C
 
-typedef struct {
-	uint8_t addr;
-	uint8_t subid;
-} i2c_dev_t;
+/* TEST SZENARIO VARIABLES BEGIN*/
 
-#define ADS1015_ADDRESS_GND         (0x48)    // 1001 000 (ADDR = GND)
-#define ADS1015_ADDRESS_VCC 		 0x49
+#define MSG_COUNT_SENT 2500 	//defines the max number of messages every node transmits to gateway
+#define COUNT_LORA_PLATFORMS 10	//total number of platforms transmitting messages to gateway, used to generate unique messages for each node
+#define NODE_ID 9 				/*<--- change NODE_ID for every node 0-9 */
+#define SPREADING_FACTOR DR_SF7
+/* TEST SZENARIO VARIABLES END*/
 
-const i2c_dev_t I2C_DEVICES[] = {
-    { .addr = ADS1015_ADDRESS_GND, .subid = 1 },
-	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2 }
-};
+#define INIT_MSG_VAL NODE_ID    //generate unique messages for each node
 
-static uint8_t currentI2C = 0;
+uint8_t currentGPSModuleSubID = 1;
+uint16_t currentMsgVal = INIT_MSG_VAL;
+uint16_t tx_count = 0;
 
-int setupI2C();
-
-#ifdef ADS1115
-uint16_t readADS1115(uint8_t addr, uint8_t channel);
-#endif
-#endif
 
 #ifdef ABP
-static u4_t DEVADDR = 0x03FF0001; // <-- Change this address for every node!
+
+/* Generate unique device addresses for each node as defined in LDAP*/
+static u4_t DEVADDR = 0x03FF0003+NODE_ID;
+
 static u1_t NWKSKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
 static u1_t APPSKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
 #else
@@ -67,10 +101,6 @@ static size_t msglen;
 
 static osjob_t sendjob;
 
-// Schedule TX every this many seconds (might become longer due to duty
-// cycle limitations).
-const unsigned TX_INTERVAL = 10;
-
 const lmic_pinmap lmic_pins = {
     .nss = QM_PIN_ID_0,
     .rxtx = LMIC_UNUSED_PIN,
@@ -78,7 +108,7 @@ const lmic_pinmap lmic_pins = {
     .dio = { QM_PIN_ID_14, LMIC_UNUSED_PIN, QM_PIN_ID_5 }
 };
 
-void do_send(osjob_t* j)
+static void sensor_measurement_tx(osjob_t* j)
 {
     // Check if there is not a current TX/RX job running
     if (LMIC.opmode & OP_TXRXPEND) {
@@ -86,17 +116,32 @@ void do_send(osjob_t* j)
     	int i=0;
     	i++;
     } else {
-    	uint16_t val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
-    	currentI2C++;
-    	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
 
-    	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;;
-    	vm.id = I2C_DEVICES[currentI2C].subid;
+    	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;
+    	vm.id = currentGPSModuleSubID;
     	vm.has_int_val = true;
-    	vm.int_val = val;
+    	vm.int_val = currentMsgVal;
+    	/* Generate unique messages for each node, to be able to identify which
+    	 * node's messages got lost during the test. To do so every node
+    	 * starts sending its NODE_ID (inital value of currentMsgVal) and then adds
+    	 * COUNT_LORA_PLATFORMS for every new message.
+    	 * For 10 nodes (COUNT_LORA_PLATFORMS = 10) the following messages are
+    	 * generated:
+    	 *    node 0's messages: 0, 10, 20, 30, ...
+    	 *    node 1's messages: 1, 11, 21, 31, ...
+    	 *    node 2's messages: 2, 12, 22, 32, ...
+    	 *    node 3's messages: 3, 13, 23, 33, ...
+    	 *    node 4's messages: 4, 14, 24, 34, ...
+    	 *    node 5's messages: 5, 15, 25, 35, ...
+    	 *    node 6's messages: 6, 16, 26, 36, ...
+    	 *    node 7's messages: 7, 17, 27, 37, ...
+    	 *    node 8's messages: 8, 18, 28, 38, ...
+    	 *    node 9's messages: 9, 19, 29, 39, ...
+    	 */
+    	currentMsgVal+=COUNT_LORA_PLATFORMS;
 
     	msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-        LMIC_setTxData2(1, msg, msglen, 0);
+		LMIC_setTxData2(1, msg, msglen, 0);
     }
 }
 
@@ -137,6 +182,8 @@ void onEvent (ev_t ev)
 		// Serial.println(F("EV_REJOIN_FAILED"));
 		break;
 	case EV_TXCOMPLETE:
+		/*Count the number of sent messages*/
+		tx_count++;
 		// Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
 		if (LMIC.txrxFlags & TXRX_ACK) {
 			//   Serial.println(F("Received ack"));
@@ -169,8 +216,10 @@ void onEvent (ev_t ev)
 			}
 		}
 
-		// Schedule next transmission
-		os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
+		// Schedule next transmission and stop when maximum number of messages to be sent is reached
+		if(tx_count<MSG_COUNT_SENT){
+			os_setTimedCallback(&sendjob, os_getTime(), sensor_measurement_tx);
+		}
 		break;
 	case EV_LOST_TSYNC:
 		// Serial.println(F("EV_LOST_TSYNC"));
@@ -194,141 +243,8 @@ void onEvent (ev_t ev)
     }
 }
 
-#ifdef I2C
-int setupI2C()
-{
-	/*  Enable I2C 0 */
-	clk_periph_enable(CLK_PERIPH_CLK | CLK_PERIPH_I2C_M0_REGISTER);
-
-	/* set IO pins for SDA and SCL */
-	qm_pmux_select(QM_PIN_ID_6, QM_PMUX_FN_2);
-	qm_pmux_select(QM_PIN_ID_7, QM_PMUX_FN_2);
-
-	/* Configure I2C */
-	qm_i2c_config_t I2Ccfg;
-	I2Ccfg.address_mode = QM_I2C_7_BIT;
-	I2Ccfg.mode = QM_I2C_MASTER;
-	I2Ccfg.speed = QM_I2C_SPEED_STD;
-
-	/* set the configuration through the structure and return if failure */
-	if (qm_i2c_set_config(QM_I2C_0, &I2Ccfg) == 0) {
-		// Ok
-		return true;
-	}
-
-	return false;
-}
-
-#ifdef ADS1115
-#define ADS1115_REG_POINTER_CONVERT
-
-int writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value)
-{
-	qm_i2c_status_t status;
-	int rc;
-
-	rc = qm_i2c_master_write(QM_I2C_0, i2cAddress, &reg, sizeof(reg), false, &status);
-	if (rc) return rc;
-
-	uint8_t data = (uint8_t)(value>>8);
-	rc = qm_i2c_master_write(QM_I2C_0, i2cAddress, &data, sizeof(data), false, &status);
-	if (rc) return rc;
-
-	data = (uint8_t)(value & 0xFF);
-	rc = qm_i2c_master_write(QM_I2C_0, i2cAddress, &data, sizeof(data), true, &status);
-	if (rc) return rc;
-
-	return 0;
-}
-
-uint16_t readRegister(uint8_t i2cAddress, uint8_t reg)
-{
-	qm_i2c_status_t status;
-	int rc;
-
-	rc = qm_i2c_master_write(QM_I2C_0, i2cAddress, &reg, sizeof(reg), true, &status);
-	if (rc) return rc;
-
-	uint8_t data[2];
-	rc = qm_i2c_master_read(QM_I2C_0, i2cAddress, data, sizeof(data), true, &status);
-	if (rc) return rc;
-
-	return ((uint16_t)(data[0] << 8)) | data[1];
-}
-
-uint16_t readADS1115(uint8_t addr, uint8_t channel)
-{
-	if (channel > 3)
-		return 0;
-
-#define ADS1015_REG_CONFIG_CQUE_NONE    (0x0003)  // Disable the comparator and put ALERT/RDY in high state (default)
-#define ADS1015_REG_CONFIG_CLAT_NONLAT  (0x0000)  // Non-latching comparator (default)
-#define ADS1015_REG_CONFIG_CPOL_ACTVLOW (0x0000)  // ALERT/RDY pin is low when active (default)
-#define ADS1015_REG_CONFIG_CPOL_ACTVLOW (0x0000)  // ALERT/RDY pin is low when active (default)
-#define ADS1015_REG_CONFIG_CMODE_TRAD   (0x0000)  // Traditional comparator with hysteresis (default)
-#define ADS1015_REG_CONFIG_DR_1600SPS   (0x0080)  // 1600 samples per second (default)
-#define ADS1015_REG_CONFIG_MODE_SINGLE  (0x0100)  // Power-down single-shot mode (default)
-#define ADS1015_REG_CONFIG_PGA_6_144V   (0x0000)  // +/-6.144V range = Gain 2/3
-
-#define ADS1015_REG_CONFIG_MUX_SINGLE_0 (0x4000)  // Single-ended AIN0
-#define ADS1015_REG_CONFIG_MUX_SINGLE_1 (0x5000)  // Single-ended AIN1
-#define ADS1015_REG_CONFIG_MUX_SINGLE_2 (0x6000)  // Single-ended AIN2
-#define ADS1015_REG_CONFIG_MUX_SINGLE_3 (0x7000)  // Single-ended AIN3
-#define ADS1015_REG_CONFIG_OS_SINGLE    (0x8000)  // Write: Set to start a single-conversion
-
-#define ADS1015_REG_POINTER_CONVERT     (0x00)
-#define ADS1015_REG_POINTER_CONFIG      (0x01)
-
-#define ADS1115_CONVERSIONDELAY         (8)		  // ms
-
-	uint16_t config = ADS1015_REG_CONFIG_CQUE_NONE    | // Disable the comparator (default val)
-			ADS1015_REG_CONFIG_CLAT_NONLAT  | // Non-latching (default val)
-			ADS1015_REG_CONFIG_CPOL_ACTVLOW | // Alert/Rdy active low   (default val)
-			ADS1015_REG_CONFIG_CMODE_TRAD   | // Traditional comparator (default val)
-			ADS1015_REG_CONFIG_DR_1600SPS   | // 1600 samples per second (default)
-			ADS1015_REG_CONFIG_MODE_SINGLE;   // Single-shot mode (default)
-
-	  // Set PGA/voltage range
-	  config |= ADS1015_REG_CONFIG_PGA_6_144V;
-
-	  // Set single-ended input channel
-	  switch (channel) {
-	    case (0):
-	      config |= ADS1015_REG_CONFIG_MUX_SINGLE_0;
-	      break;
-	    case (1):
-	      config |= ADS1015_REG_CONFIG_MUX_SINGLE_1;
-	      break;
-	    case (2):
-	      config |= ADS1015_REG_CONFIG_MUX_SINGLE_2;
-	      break;
-	    case (3):
-	      config |= ADS1015_REG_CONFIG_MUX_SINGLE_3;
-	      break;
-	  }
-
-	  // Set 'start single-conversion' bit
-	  config |= ADS1015_REG_CONFIG_OS_SINGLE;
-
-	  // Write config register to the ADC
-	  writeRegister(addr, ADS1015_REG_POINTER_CONFIG, config);
-
-	  // Wait for the conversion to complete
-	  clk_sys_udelay(ADS1115_CONVERSIONDELAY * 1000);
-
-	  // Read the conversion results
-	  // Shift 12-bit results right 4 bits for the ADS1015
-	  return readRegister(addr, ADS1015_REG_POINTER_CONVERT);
-}
-#endif
-#endif
-
 int main(void)
 {
-#ifdef I2C
-	setupI2C();
-#endif
-
     // LMIC init
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.
@@ -338,15 +254,21 @@ int main(void)
 #ifdef ABP
     LMIC_setSession (0x1, DEVADDR, NWKSKEY, APPSKEY);
 
-    LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
-	LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
+    //for first 8 nodes asign to every node a separate tx channel
+    if(NODE_ID >= 0 && NODE_ID <= 7){
+    	for(int channel = 0; channel < 72; channel++){
+    	        	LMIC_disableChannel(channel);
+    	       }
+
+    	LMIC_enableChannel(NODE_ID);
+    }
+    else{
+    	//for all other nodes enable channels 0 to 7
+    	//by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
+    	for(int channel = 8; channel < 72; channel++){
+    	    LMIC_disableChannel(channel);
+    	}
+    }
 
 	// Disable link check validation
 	LMIC_setLinkCheckMode(0);
@@ -355,14 +277,12 @@ int main(void)
 	LMIC.dn2Dr = DR_SF9;
 
 	// Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
-	LMIC_setDrTxpow(DR_SF7, 14);
+	LMIC_setDrTxpow(SPREADING_FACTOR, 14);
 #endif
 
     LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
-
     // Start job (sending automatically starts OTAA too)
-    do_send(&sendjob);
-
+    sensor_measurement_tx(&sendjob);
     os_runloop();
 
     return 0;

@@ -29,17 +29,78 @@
 
 DEFAULT_SOC = quark_d2000
 DEFAULT_TARGET = x86
+SUPPORTED_SOCS = quark_se \
+                 quark_d2000
+
+SUPPORTED_BUILDS = debug \
+                   release \
+		   lto
 
 SOC ?= $(DEFAULT_SOC)
 TARGET ?= $(DEFAULT_TARGET)
-BUILD ?= debug
 
-### Make all Spi Slave apps
-SUBDIRS := $(filter %/, $(wildcard ./*/))
+### Define supported targets for each SoCs
+SUPPORTED_TARGETS_quark_d2000 = x86
+SUPPORTED_TARGETS_quark_se = x86 \
+                             sensor
 
-all clean realclean:: $(SUBDIRS)
+ifeq ($(filter $(SOC),$(SUPPORTED_SOCS)),)
+$(error SOC=$(SOC) is not supported. Run 'make help' for help)
+endif
 
-$(SUBDIRS):
-	$(MAKE) SOC=$(SOC) TARGET=$(TARGET) BUILD=$(BUILD) -C $@ $(MAKECMDGOALS)
+### $(SOC) is expanded here to match the correct variable
+SUPPORTED_TARGETS = $(SUPPORTED_TARGETS_$(SOC))
 
-.PHONY: $(SUBDIRS)
+ifeq ($(filter $(TARGET),$(SUPPORTED_TARGETS)),)
+$(error TARGET=$(TARGET) is not supported for $(SOC). Run 'make help' for help)
+endif
+
+RULES = libqmsi
+
+BASE_DIR = .
+
+include $(BASE_DIR)/base.mk
+include $(BASE_DIR)/soc/$(SOC)/$(SOC).mk
+include $(BASE_DIR)/drivers/libqmsi.mk
+
+.PHONY: help targets distclean
+
+targets:
+	$(info List of supported values for $(SOC): $(SUPPORTED_TARGETS))
+
+help:
+	$(info )
+	$(info List of build targets. By default all targets are built.)
+	$(info libqmsi  - Build the libqmsi package)
+	$(info targets  - List the targets available for SOC)
+	$(info )
+	$(info List of clean targets.)
+	$(info clean     - Clean specified TARGET for the given SOC)
+	$(info distclean - Clean all generated files)
+	$(info )
+	$(info By default SOC=$(DEFAULT_SOC).)
+	$(info By default TARGET=$(DEFAULT_TARGET).)
+	$(info )
+	$(info Verbosity of Make is controlled by V=0 / 1)
+	$(info By default V=0.)
+	$(info )
+	$(info stdout UART initialisation STDOUT_UART_INIT=enable / disable)
+	$(info By default STDOUT_UART_INIT=enable.)
+	$(info )
+	$(info List of supported values for SOC: $(SUPPORTED_SOCS))
+	$(info List of supported values for CSTD: c90 and c99)
+
+all: $(RULES)
+
+distclean:
+	$(MAKE) -C doc/ clean
+	$(foreach soc, $(SUPPORTED_SOCS),\
+	$(foreach target, $(SUPPORTED_TARGETS_$(soc)),\
+	$(foreach build, $(SUPPORTED_BUILDS),\
+		$(MAKE) SOC=$(soc) TARGET=$(target) BUILD=$(build)\
+			realclean $(END_CMD))))
+	$(foreach soc, $(SUPPORTED_SOCS),\
+	$(foreach target, $(SUPPORTED_TARGETS_$(soc)),\
+	$(foreach build, $(SUPPORTED_BUILDS),\
+		$(MAKE) SOC=$(soc) TARGET=$(target) BUILD=$(build) -C examples\
+			realclean $(END_CMD))))

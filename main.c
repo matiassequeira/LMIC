@@ -17,18 +17,31 @@
 #include "hdc1000_read.h"
 
 //include power functions:
-//#include "clk.h"
 #include "power_states.h"
 #include "qm_adc.h"
 #include "qm_common.h"
 #include "qm_comparator.h"
-//#include "qm_gpio.h"
 #include "qm_interrupt.h"
 #include "qm_interrupt_router.h"
 #include "qm_isr.h"
-//#include "qm_pinmux.h"
 #include "qm_pin_functions.h"
 #include "qm_rtc.h"
+
+/* Moisture Sensors test sleep interval 10 minutes */
+//#define SLEEP_SECONDS_INTERVAL 600 //Sleep interval in seconds between sensor measurements
+
+/* Other Sensors test sleep interval 15 seconds */
+#define SLEEP_SECONDS_INTERVAL 	1 	//Sleep interval in seconds between sensor measurements
+
+/* How many sleep cycles are passed without transmitting sensor value if not changed.
+ * Then a message is sent to notify that all is ok.
+ * So every [SLEEP_SECONDS_INTERVAL x SLEEPTHRESHOLD] seconds a message is transmitted
+ * if no sensor value changed. */
+#define SLEEPTHRESHOLD 			10//15*20 = 5 min
+#define VALUETHRESHOLD 0.01
+uint16_t sleepCycleCounter = 0;
+
+static void rtc_sleep_callback();
 
 #ifdef I2C
 
@@ -42,20 +55,20 @@ typedef struct {
 #define ADS1015_ADDRESS_VCC 		(0x49)	  // 1001 001 (ADDR = VCC)
 #define ADS1015_ADDRESS_SDA 		(0x50)	  // 1001 010 (ADDR = SDA)
 #define ADS1015_ADDRESS_SCL			(0x51)	  // 1001 011 (ADDR = SCL)
-#define HDC1000_ADDRESS_00			(0x40) 	  //1000 000
+//#define HDC1000_ADDRESS_00			(0x40) 	  //1000 000
 //#define HDC1000_ADDRESS_01			(0x41)    //1000 001
 //#define HDC1000_ADDRESS_10			(0x42)    //1000 010
 //#define HDC1000_ADDRESS_11			(0x43)    //1000 011
 
-const i2c_dev_t I2C_DEVICES[] = {
+i2c_dev_t I2C_DEVICES[] = {
 	/* Moisture Sensors test: */
-	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
-	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
+	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
+	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
 
 	/* Other Sensors test: */
-	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
-	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
-    { .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
+	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
+	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
+    //{ .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
 
 };
 
@@ -70,9 +83,10 @@ uint16_t readADS1115(uint8_t addr, uint8_t channel);
 
 #ifdef ABP
 /*Moisture Sensors test device: */
-//static u4_t DEVADDR = 0x03FF0001; // <-- Change this address for every node!
+static u4_t DEVADDR = 0x03FF0001; // <-- Change this address for every node!
 /*Other Sensors test device: */
-static u4_t DEVADDR = 0x03FF0002; // <-- Change this address for every node!
+//static u4_t DEVADDR = 0x03FF0002; // <-- Change this address for every node!
+
 static u1_t NWKSKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
 static u1_t APPSKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
 #else
@@ -103,7 +117,7 @@ static osjob_t sendjob;
 
 // Schedule TX every this many seconds (might become longer due to duty
 // cycle limitations).
-const unsigned TX_INTERVAL = 1;
+//const unsigned TX_INTERVAL = 1;
 
 const lmic_pinmap lmic_pins = {
     .nss = QM_PIN_ID_0,
@@ -112,141 +126,19 @@ const lmic_pinmap lmic_pins = {
     .dio = { QM_PIN_ID_14, LMIC_UNUSED_PIN, QM_PIN_ID_5 }
 };
 
-void do_send(osjob_t* j)
-{
-    // Check if there is not a current TX/RX job running
-    if (LMIC.opmode & OP_TXRXPEND) {
-        // Serial.println(F("OP_TXRXPEND, not sending"));
-    	int i=0;
-    	i++;
-    } else {
-    	uint16_t val;
-    	//hdc1000_sensor_data_t sensor_info;
-    	//int status;
-    	/*if(I2C_DEVICES[currentI2C].subid == 3){
-    		//read HDC1000 Temperature
-    		//hdc1000_sensor_read(&sensor_info, HDC1000_MEASUREMENT_MODE_TEMPERATURE);
-    		//val = sensor_info.temperature;
-    		//val = 23;
-    		status = i2c_init();
-
-    		if(status){
-    			//printf("i2c init failed!!!");
-    			//val = 1;
-    		}
-    		else{
-    			status = hdc1000_sensor_init(HDC1000_MEASUREMENT_MODE_COMBINED, HDC1000_RESOLUTION_14BIT,
-    					HDC1000_BATTERY_STATUS_LOW_INDICATION_DISABLE,
-						HDC1000_DO_SOFT_RESET);
-    			if(status){
-    				//printf("sensor init error!!!");
-    				//val = 3;
-    			}
-    			else{
-    				status = sensor_read(&sensor_info, HDC1000_MEASUREMENT_MODE_COMBINED, 1);
-
-    				if(status){
-    					//printf("sensor read error!!!");
-    					//val = 2;
-    				}
-    				else{
-    					val = sensor_info.temperature;
-    				}
-    			}
-    		}
-    	}
-    	else if(I2C_DEVICES[currentI2C].subid == 4){
-    		//read HDC1000 Humidity
-    		//hdc1000_sensor_read(&sensor_info, HDC1000_MEASUREMENT_MODE_HUMIDITY);
-    		//val = sensor_info.humidity;
-    		//val = 65;
-    		status = i2c_init();
-    		if(status){
-    			//printf("i2c init failed!!!");
-    			val = 1;
-    		}
-    		else{
-    			status = hdc1000_sensor_init(HDC1000_MEASUREMENT_MODE_COMBINED, HDC1000_RESOLUTION_14BIT,
-    					HDC1000_BATTERY_STATUS_LOW_INDICATION_DISABLE,
-						HDC1000_DO_SOFT_RESET);
-    			if(status){
-    				//printf("sensor init error!!!");
-    				val = status;
-    			}
-    			else{
-    				status = sensor_read(&sensor_info, HDC1000_MEASUREMENT_MODE_COMBINED, 1);
-
-    				if(status){
-    					//printf("sensor read error!!!");
-    					val = 2;
-    				}
-    				else{
-    					val = sensor_info.humidity;
-    				}
-    			}
-    		}
-    	}*/
-    	//else{
-    		val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
-    		//val = 7; 0 --- agua, 100%
-    		//100% in water S1: 15600 - 16211	//Moisture Sensor 1 (left sensor)
-    		//              S2: 13635 - 16833 	//Moisture Sensor 2 (right sensor)
-    		//				S1,S2        >13500 //in water
-    		//			 	S1,S2: 8500 - 13500 //muy mojado
-    		//				S1,S2: 4600 -  8500 //mojado
-    		//				S1,S2: 2500 -  4600 //húmedo
-    		//				S1,S2:  500 -  2500	//poco húmedo
-    		//				S1,S2: 0-500,>65000 //seco
-
-    		//0% dry		S1: 65535 S2: 65532
-    		// delta(max-min): 53247
-
-    		//val = 100 - 100 * (val - min)/(max-min)
-    		//LUA SCRIPT Moisture % formula:
-    		//float val = 123.07735647 - 100 * val / 53247;
-    	//}
-    	printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);//, I2C_DEVICES[currentI2C].old_val);
-    	/*switch(I2C_DEVICES[currentI2C].subid){
-    	case 1: printf("\tMo1\n\r");
-    			break;
-    	case 2:	printf("\tMo2\n\r");
-				break;
-    	case 3:	printf("\tT\n\r");
-				break;
-    	case 4:	printf("\tH\n\r");
-				break;
-    	default: break;
-    	}*/
-
-    	/*Moisture Sensor Test output: */
-    	//if(val<500){printf("\tSeco\n\r");}
-    	//else if(val<2500){printf("\tPoco humedo\n\r");}
-    	//else if(val<4600){printf("\tHúmedo\n\r");}
-    	//else if(val<8500){printf("\tMojado\n\r");}
-    	//else if(val<13500){printf("\tMuy mojado\n\r");}
-    	//else if(val<65000){printf("\tEn agua\n\r");}
-    	//else{printf("\tSin agua\n\r");}
-
-
-    	currentI2C++;
-    	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
-
-    	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;;
-    	vm.id = I2C_DEVICES[currentI2C].subid;
-    	vm.has_int_val = true;
-    	vm.int_val = val;
-
-    	msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-        LMIC_setTxData2(1, msg, msglen, 0);
-    }
+/* function returns true if value is inside the range of test_val +/- threashold in % */
+int isInThreashold(int value, int test_val, float threashold){
+	if((float)value >= (float)(1-threashold)*(float)test_val && value <= (float)(1+threashold)*(float)test_val ){
+		return 0;
+	}
+	else{
+		return 1;
+	}
 }
-
 
 static void rtc_sleep_wakeup()
 {
-
 	qm_rtc_config_t rtc_cfg;
-
 	clk_periph_enable(CLK_PERIPH_RTC_REGISTER | CLK_PERIPH_CLK);
 
 	/*
@@ -256,7 +148,8 @@ static void rtc_sleep_wakeup()
 	rtc_cfg.init_val = 0;
 	rtc_cfg.alarm_en = 1;
 	rtc_cfg.alarm_val = QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1);
-	rtc_cfg.callback = NULL;
+	/* after sleep interval schedule next sensor mediation */
+	rtc_cfg.callback = rtc_sleep_callback;
 	rtc_cfg.callback_data = NULL;
 	rtc_cfg.prescaler = CLK_RTC_DIV_1;
 	qm_rtc_set_config(QM_RTC_0, &rtc_cfg);
@@ -283,11 +176,90 @@ static void rtc_sleep_wakeup()
 
 	QM_PUTS("Go to deep sleep with RTC.");
 	qm_rtc_set_alarm(QM_RTC_0, QM_RTC[QM_RTC_0]->rtc_ccvr +
-				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1) * 600);
+				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1) * SLEEP_SECONDS_INTERVAL);
 	qm_power_soc_deep_sleep(QM_POWER_WAKE_FROM_RTC);
-	// Schedule next transmission
-	os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
+}
 
+static void sensor_measurement_tx(osjob_t* j)
+{
+    // Check if there is not a current TX/RX job running
+    if (LMIC.opmode & OP_TXRXPEND) {
+        // Serial.println(F("OP_TXRXPEND, not sending"));
+    	int i=0;
+    	i++;
+    } else {
+    	uint16_t val;
+    	val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
+
+    	printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);//, I2C_DEVICES[currentI2C].old_val);
+    	/*switch(I2C_DEVICES[currentI2C].subid){
+    	case 1: printf("\tMo1\n\r");
+    			break;
+    	case 2:	printf("\tMo2\n\r");
+				break;
+    	case 3:	printf("\tT\n\r");
+				break;
+    	case 4:	printf("\tH\n\r");
+				break;
+    	default: break;
+    	}*/
+
+    	/*Moisture Sensor Test output: */
+    	//if(val<500){printf("\tSeco\n\r");}
+    	//else if(val<2500){printf("\tPoco humedo\n\r");}
+    	//else if(val<4600){printf("\tHúmedo\n\r");}
+    	//else if(val<8500){printf("\tMojado\n\r");}
+    	//else if(val<13500){printf("\tMuy mojado\n\r");}
+    	//else if(val<65000){printf("\tEn agua\n\r");}
+    	//else{printf("\tSin agua\n\r");}
+
+    	currentI2C++;
+    	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
+
+    	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;
+    	vm.id = I2C_DEVICES[currentI2C].subid;
+    	vm.has_int_val = true;
+
+
+    	/* Other Sensors test:
+    	 * First identify if new sensor value passed a threshold in comparison to old value.
+    	 * In this case send message with new value to base station and update values.
+    	 * After that put device to sleep for a predefined interval (SLEEP_SECONDS_INTERVAL),
+    	 * then schedule next measurement. If no value changed put device to sleep without
+    	 * message transfer to save more energy. To avoid having a device running out of energy
+    	 * or stopping to work properly every few sleep intervals (SLEEPTHRESHOLD) a message
+    	 * is sent with current values to notify the base station that everything is OK. */
+
+    	//uint16_t sleepCycleCounter = 0;
+    	if(isInThreashold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0  || sleepCycleCounter >= SLEEPTHRESHOLD){
+    	//if(val != I2C_DEVICES[currentI2C].old_val || sleepCycleCounter >= SLEEPTHRESHOLD){
+    	//if(sleepCycleCounter >= SLEEPTHRESHOLD){
+    		sleepCycleCounter = 0;
+    		I2C_DEVICES[currentI2C].old_val = val;
+    		vm.int_val = val;
+    		msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
+    		LMIC_setTxData2(1, msg, msglen, 0);
+
+    	}
+    	else{
+    		//vm.int_val = val;
+    		//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
+    	    //LMIC_setTxData2(1, msg, msglen, 0);
+    		/*Don´t send message, save energy and sleep*/
+      		sleepCycleCounter++;
+      		rtc_sleep_wakeup();
+    	}
+    	/* Moisture Sensor Test*/
+    	//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
+		//LMIC_setTxData2(1, msg, msglen, 0);
+
+    }
+}
+
+void rtc_sleep_callback(){
+	printf("good morning!");
+	// Schedule next transmission
+	os_setTimedCallback(&sendjob, os_getTime(), sensor_measurement_tx);
 }
 
 void onEvent (ev_t ev)
@@ -358,7 +330,7 @@ void onEvent (ev_t ev)
 				break;
 			}
 		}
-		/* Set up the RTC to wake up the SoC from sleep. */
+		/* Set up the RTC to wake up the SoC from sleep and put board to sleep mode. */
 		rtc_sleep_wakeup();
 		break;
 	case EV_LOST_TSYNC:
@@ -527,18 +499,6 @@ int main(void)
 #ifdef ABP
     LMIC_setSession (0x1, DEVADDR, NWKSKEY, APPSKEY);
 
-    /*
-    LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
-	LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-	LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
-    */
-
     //by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
     for(int channel = 8; channel < 72; channel++){
     	LMIC_disableChannel(channel);
@@ -556,7 +516,7 @@ int main(void)
     LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
 
     // Start job (sending automatically starts OTAA too)
-    do_send(&sendjob);
+    sensor_measurement_tx(&sendjob);
 
     os_runloop();
 

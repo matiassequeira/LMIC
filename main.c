@@ -8,6 +8,7 @@
 #include <clk.h>
 
 #include "lmic/lmic.h"
+
 #include "lmic/hal/hal.h"
 
 #include "pb_decode.h"
@@ -27,19 +28,11 @@
 #include "qm_pin_functions.h"
 #include "qm_rtc.h"
 
-/* Moisture Sensors test sleep interval 10 minutes */
-//#define SLEEP_SECONDS_INTERVAL 600 //Sleep interval in seconds between sensor measurements
+#define MIN_SLEEP_INTERVAL 	1 	//Sleep interval in seconds between sensor measurements
+#define MAX_SLEEP_INTERVAL 100
+#define VALUETHRESHOLD 0.05 //0.01 = 1 %
 
-/* Other Sensors test sleep interval 15 seconds */
-#define SLEEP_SECONDS_INTERVAL 	1 	//Sleep interval in seconds between sensor measurements
-
-/* How many sleep cycles are passed without transmitting sensor value if not changed.
- * Then a message is sent to notify that all is ok.
- * So every [SLEEP_SECONDS_INTERVAL x SLEEPTHRESHOLD] seconds a message is transmitted
- * if no sensor value changed. */
-#define SLEEPTHRESHOLD 			10//15*20 = 5 min
-#define VALUETHRESHOLD 0.01
-uint16_t sleepCycleCounter = 0;
+uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
 
 static void rtc_sleep_callback();
 
@@ -126,9 +119,9 @@ const lmic_pinmap lmic_pins = {
     .dio = { QM_PIN_ID_14, LMIC_UNUSED_PIN, QM_PIN_ID_5 }
 };
 
-/* function returns true if value is inside the range of test_val +/- threashold in % */
-int isInThreashold(int value, int test_val, float threashold){
-	if((float)value >= (float)(1-threashold)*(float)test_val && value <= (float)(1+threashold)*(float)test_val ){
+/* function returns 0 if value is inside the range of test_val +/- threshold */
+int isInThreshold(int value, int test_val, float threshold){
+	if((float)value >= (float)(1-threshold)*(float)test_val && value <= (float)(1+threshold)*(float)test_val ){
 		return 0;
 	}
 	else{
@@ -136,7 +129,7 @@ int isInThreashold(int value, int test_val, float threashold){
 	}
 }
 
-static void rtc_sleep_wakeup()
+static void rtc_sleep_wakeup(uint16_t sleep_interval)
 {
 	qm_rtc_config_t rtc_cfg;
 	clk_periph_enable(CLK_PERIPH_RTC_REGISTER | CLK_PERIPH_CLK);
@@ -176,7 +169,7 @@ static void rtc_sleep_wakeup()
 
 	QM_PUTS("Go to deep sleep with RTC.");
 	qm_rtc_set_alarm(QM_RTC_0, QM_RTC[QM_RTC_0]->rtc_ccvr +
-				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1) * SLEEP_SECONDS_INTERVAL);
+				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1) * sleep_interval);
 	qm_power_soc_deep_sleep(QM_POWER_WAKE_FROM_RTC);
 }
 
@@ -187,22 +180,15 @@ static void sensor_measurement_tx(osjob_t* j)
         // Serial.println(F("OP_TXRXPEND, not sending"));
     	int i=0;
     	i++;
-    } else {
+    }
+    else {
+    	currentI2C++;
+    	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
+
     	uint16_t val;
     	val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
 
-    	printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);//, I2C_DEVICES[currentI2C].old_val);
-    	/*switch(I2C_DEVICES[currentI2C].subid){
-    	case 1: printf("\tMo1\n\r");
-    			break;
-    	case 2:	printf("\tMo2\n\r");
-				break;
-    	case 3:	printf("\tT\n\r");
-				break;
-    	case 4:	printf("\tH\n\r");
-				break;
-    	default: break;
-    	}*/
+    	printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);
 
     	/*Moisture Sensor Test output: */
     	//if(val<500){printf("\tSeco\n\r");}
@@ -213,50 +199,37 @@ static void sensor_measurement_tx(osjob_t* j)
     	//else if(val<65000){printf("\tEn agua\n\r");}
     	//else{printf("\tSin agua\n\r");}
 
-    	currentI2C++;
-    	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
-
     	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;
     	vm.id = I2C_DEVICES[currentI2C].subid;
     	vm.has_int_val = true;
 
 
-    	/* Other Sensors test:
-    	 * First identify if new sensor value passed a threshold in comparison to old value.
-    	 * In this case send message with new value to base station and update values.
-    	 * After that put device to sleep for a predefined interval (SLEEP_SECONDS_INTERVAL),
-    	 * then schedule next measurement. If no value changed put device to sleep without
-    	 * message transfer to save more energy. To avoid having a device running out of energy
-    	 * or stopping to work properly every few sleep intervals (SLEEPTHRESHOLD) a message
-    	 * is sent with current values to notify the base station that everything is OK. */
-
-    	//uint16_t sleepCycleCounter = 0;
-    	if(isInThreashold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0  || sleepCycleCounter >= SLEEPTHRESHOLD){
-    	//if(val != I2C_DEVICES[currentI2C].old_val || sleepCycleCounter >= SLEEPTHRESHOLD){
-    	//if(sleepCycleCounter >= SLEEPTHRESHOLD){
-    		sleepCycleCounter = 0;
+    	/* If sensor value changed more than stored old_val +- VALUETRESHOLD
+    	 * set next sleep interval to min to get more sensor updates*/
+    	if(isInThreshold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0 ){
+    		nextSleepInterval = MIN_SLEEP_INTERVAL;
     		I2C_DEVICES[currentI2C].old_val = val;
-    		vm.int_val = val;
-    		msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-    		LMIC_setTxData2(1, msg, msglen, 0);
-
     	}
     	else{
-    		//vm.int_val = val;
-    		//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-    	    //LMIC_setTxData2(1, msg, msglen, 0);
-    		/*Don´t send message, save energy and sleep*/
-      		sleepCycleCounter++;
-      		rtc_sleep_wakeup();
+    		/*Increase sleep interval to next transmission to save energy */
+      		if(nextSleepInterval < MAX_SLEEP_INTERVAL){
+      			nextSleepInterval += 5;
+      		}
+      		if(nextSleepInterval >= MAX_SLEEP_INTERVAL) {
+      			nextSleepInterval = MAX_SLEEP_INTERVAL;
+      		}
     	}
+
     	/* Moisture Sensor Test*/
-    	//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-		//LMIC_setTxData2(1, msg, msglen, 0);
+    	vm.int_val = val;
+    	msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
+		LMIC_setTxData2(1, msg, msglen, 0);
 
     }
 }
 
 void rtc_sleep_callback(){
+	qm_power_soc_restore();
 	printf("good morning!");
 	// Schedule next transmission
 	os_setTimedCallback(&sendjob, os_getTime(), sensor_measurement_tx);
@@ -331,7 +304,7 @@ void onEvent (ev_t ev)
 			}
 		}
 		/* Set up the RTC to wake up the SoC from sleep and put board to sleep mode. */
-		rtc_sleep_wakeup();
+		rtc_sleep_wakeup(nextSleepInterval);
 		break;
 	case EV_LOST_TSYNC:
 		// Serial.println(F("EV_LOST_TSYNC"));

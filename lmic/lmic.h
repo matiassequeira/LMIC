@@ -139,8 +139,8 @@ enum { TXRX_ACK    = 0x80,   // confirmed UP frame was acked
 enum _ev_t { EV_SCAN_TIMEOUT=1, EV_BEACON_FOUND,
              EV_BEACON_MISSED, EV_BEACON_TRACKED, EV_JOINING,
              EV_JOINED, EV_RFU1, EV_JOIN_FAILED, EV_REJOIN_FAILED,
-             EV_TXCOMPLETE, EV_LOST_TSYNC, EV_RESET,
-             EV_RXCOMPLETE, EV_LINK_DEAD, EV_LINK_ALIVE };
+             EV_TXCOMPLETE, EV_LOST_TSYNC,
+			 EV_RESET, EV_RXCOMPLETE, EV_LINK_DEAD, EV_LINK_ALIVE };
 typedef enum _ev_t ev_t;
 
 enum {

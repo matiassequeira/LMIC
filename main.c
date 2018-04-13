@@ -55,7 +55,7 @@
 
 /* TEST SZENARIO VARIABLES BEGIN*/
 
-//#define MSG_COUNT_SENT 2500 	//defines the max number of messages every node transmits to gateway
+#define MSG_COUNT_SENT 2500 	//defines the max number of messages every node transmits to gateway
 #define COUNT_LORA_PLATFORMS 1	//total number of platforms transmitting messages to gateway, used to generate unique messages for each node
 #define NODE_ID 1				/*<--- change NODE_ID for every node 0-9 */
 #define SPREADING_FACTOR DR_SF10

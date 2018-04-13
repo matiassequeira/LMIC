@@ -55,10 +55,11 @@
 
 /* TEST SZENARIO VARIABLES BEGIN*/
 
-#define MSG_COUNT_SENT 2500 	//defines the max number of messages every node transmits to gateway
-#define COUNT_LORA_PLATFORMS 10	//total number of platforms transmitting messages to gateway, used to generate unique messages for each node
-#define NODE_ID 9 				/*<--- change NODE_ID for every node 0-9 */
-#define SPREADING_FACTOR DR_SF7
+//#define MSG_COUNT_SENT 2500 	//defines the max number of messages every node transmits to gateway
+#define COUNT_LORA_PLATFORMS 1	//total number of platforms transmitting messages to gateway, used to generate unique messages for each node
+#define NODE_ID 1				/*<--- change NODE_ID for every node 0-9 */
+#define SPREADING_FACTOR DR_SF10
+#define TX_DELAY 3
 /* TEST SZENARIO VARIABLES END*/
 
 #define INIT_MSG_VAL NODE_ID    //generate unique messages for each node
@@ -92,7 +93,9 @@ void os_getDevEui (u1_t* buf) { memcpy(buf, DEVEUI, 8); }
 // number but a block of memory, endianness does not really apply). In
 // practice, a key taken from ttnctl can be copied as-is.
 // The key shown here is the semtech default key.
-static const u1_t APPKEY[16] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
+//static const u1_t APPKEY[16] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
+static const u1_t APPKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
+
 void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 #endif
 
@@ -217,9 +220,9 @@ void onEvent (ev_t ev)
 		}
 
 		// Schedule next transmission and stop when maximum number of messages to be sent is reached
-		if(tx_count<MSG_COUNT_SENT){
-			os_setTimedCallback(&sendjob, os_getTime(), sensor_measurement_tx);
-		}
+		//if(tx_count<MSG_COUNT_SENT){
+			os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_DELAY), sensor_measurement_tx);
+		//}
 		break;
 	case EV_LOST_TSYNC:
 		// Serial.println(F("EV_LOST_TSYNC"));

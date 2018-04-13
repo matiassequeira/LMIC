@@ -1,4 +1,4 @@
-#define ABP
+#define OTAA //NOT NEEDED BUT INSTEAD OF ABP
 #define I2C
 #define ADS1115
 
@@ -55,13 +55,13 @@ typedef struct {
 
 i2c_dev_t I2C_DEVICES[] = {
 	/* Moisture Sensors test: */
-	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
-	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
+	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
+	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
 
 	/* Other Sensors test: */
-	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
-	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
-    //{ .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
+	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
+	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
+    { .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
 
 };
 
@@ -99,7 +99,8 @@ void os_getDevEui (u1_t* buf) { memcpy(buf, DEVEUI, 8); }
 // number but a block of memory, endianness does not really apply). In
 // practice, a key taken from ttnctl can be copied as-is.
 // The key shown here is the semtech default key.
-static const u1_t APPKEY[16] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
+//static const u1_t APPKEY[16] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
+static const u1_t APPKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
 void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 #endif
 
@@ -485,6 +486,11 @@ int main(void)
 	// Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
 	LMIC_setDrTxpow(DR_SF7, 14);
 #endif
+
+	 //by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
+	    for(int channel = 8; channel < 72; channel++){
+	    	LMIC_disableChannel(channel);
+	    }
 
     LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
 

@@ -1,4 +1,4 @@
-#define OTAA //NOT NEEDED BUT INSTEAD OF ABP
+#define ABP //NOT NEEDED BUT INSTEAD OF ABP
 #define I2C
 #define ADS1115
 
@@ -28,8 +28,8 @@
 #include "qm_pin_functions.h"
 #include "qm_rtc.h"
 
-#define MIN_SLEEP_INTERVAL 	1 	//Sleep interval in seconds between sensor measurements
-#define MAX_SLEEP_INTERVAL 100
+#define MIN_SLEEP_INTERVAL 	10 	//Sleep interval in seconds between sensor measurements
+#define MAX_SLEEP_INTERVAL 180
 #define VALUETHRESHOLD 0.05 //0.01 = 1 %
 
 uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
@@ -55,13 +55,13 @@ typedef struct {
 
 i2c_dev_t I2C_DEVICES[] = {
 	/* Moisture Sensors test: */
-	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
-	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
+	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Moisture Sensor 1 	- sensor-1
+	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }  //Moisture Sensor 2 	- sensor-2
 
 	/* Other Sensors test: */
-	{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
-	{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
-    { .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
+	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
+	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
+    //{ .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
 
 };
 
@@ -76,7 +76,7 @@ uint16_t readADS1115(uint8_t addr, uint8_t channel);
 
 #ifdef ABP
 /*Moisture Sensors test device: */
-static u4_t DEVADDR = 0x03FF0001; // <-- Change this address for every node!
+static u4_t DEVADDR = 0x03FF0004; // <-- Change this address for every node!
 /*Other Sensors test device: */
 //static u4_t DEVADDR = 0x03FF0002; // <-- Change this address for every node!
 
@@ -104,7 +104,8 @@ static const u1_t APPKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6,
 void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 #endif
 
-static uint8_t msg[30];
+//static uint8_t msg[30];
+static uint8_t msg[16];
 static size_t msglen;
 
 static osjob_t sendjob;
@@ -488,9 +489,9 @@ int main(void)
 #endif
 
 	 //by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
-	    for(int channel = 8; channel < 72; channel++){
-	    	LMIC_disableChannel(channel);
-	    }
+	 //   for(int channel = 8; channel < 72; channel++){
+	 //  	LMIC_disableChannel(channel);
+	 //   }
 
     LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
 

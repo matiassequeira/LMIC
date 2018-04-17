@@ -1,4 +1,4 @@
-#define ABP //NOT NEEDED BUT INSTEAD OF ABP
+#define ABP
 #define I2C
 #define ADS1115
 
@@ -8,9 +8,7 @@
 #include <clk.h>
 
 #include "lmic/lmic.h"
-
 #include "lmic/hal/hal.h"
-
 #include "pb_decode.h"
 #include "eslight/protocol.h"
 
@@ -29,16 +27,14 @@
 #include "qm_rtc.h"
 
 //include Cayenne Low Power Payload libraries
-//#include <stdio.h>
 #include "cayenne-lpp/cayenne_lpp.h"
 #include "cayenne-lpp/cayenne_lpp.c"
 
 static cayenne_lpp_t lpp;
 
-
-#define MIN_SLEEP_INTERVAL 	10 	//Sleep interval in seconds between sensor measurements
-#define MAX_SLEEP_INTERVAL 180
-#define VALUETHRESHOLD 0.05 //0.01 = 1 %
+#define MIN_SLEEP_INTERVAL		10		//Sleep interval in seconds between sensor measurements
+#define MAX_SLEEP_INTERVAL		180
+#define VALUETHRESHOLD			0.05	//0.01 = 1 %
 
 uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
 
@@ -52,10 +48,10 @@ typedef struct {
 	uint16_t old_val;
 } i2c_dev_t;
 
-#define ADS1015_ADDRESS_GND         (0x48)    // 1001 000 (ADDR = GND)
-#define ADS1015_ADDRESS_VCC 		(0x49)	  // 1001 001 (ADDR = VCC)
-#define ADS1015_ADDRESS_SDA 		(0x50)	  // 1001 010 (ADDR = SDA)
-#define ADS1015_ADDRESS_SCL			(0x51)	  // 1001 011 (ADDR = SCL)
+#define ADS1015_ADDRESS_GND				(0x48)    // 1001 000 (ADDR = GND)
+#define ADS1015_ADDRESS_VCC				(0x49)	  // 1001 001 (ADDR = VCC)
+#define ADS1015_ADDRESS_SDA				(0x50)	  // 1001 010 (ADDR = SDA)
+#define ADS1015_ADDRESS_SCL				(0x51)	  // 1001 011 (ADDR = SCL)
 //#define HDC1000_ADDRESS_00			(0x40) 	  //1000 000
 //#define HDC1000_ADDRESS_01			(0x41)    //1000 001
 //#define HDC1000_ADDRESS_10			(0x42)    //1000 010
@@ -70,7 +66,6 @@ i2c_dev_t I2C_DEVICES[] = {
 	//{ .addr = ADS1015_ADDRESS_GND, .subid = 1, .old_val = 0 }, //Carbono Monoxide 		- sensor-3
 	//{ .addr = ADS1015_ADDRESS_VCC, .subid = 2, .old_val = 0 }, //Touch Sensor     		- sensor-4
     //{ .addr = ADS1015_ADDRESS_SDA, .subid = 3, .old_val = 0 }  //Sound Sensor     		- sensor-5
-
 };
 
 static uint8_t currentI2C = 0;

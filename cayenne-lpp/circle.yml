@@ -1,0 +1,17 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: riot/riotbuild
+    steps:
+      - checkout
+      - run:
+          command: make
+      - run:
+          command: tests/test
+      - run:
+          command: make doc
+      - store_artifacts:
+          path: doc/html
+          destination: doc

@@ -29,8 +29,11 @@
 #include "qm_rtc.h"
 
 //include Cayenne Low Power Payload libraries
-#include "CayenneLPP/CayenneLPP.h"
-CayenneLPP lpp(51);
+//#include <stdio.h>
+#include "CayenneLPP/cayenne_lpp.h"
+#include "CayenneLPP/cayenne_lpp.c"
+
+static cayenne_lpp_t lpp;
 
 
 #define MIN_SLEEP_INTERVAL 	10 	//Sleep interval in seconds between sensor measurements
@@ -110,8 +113,8 @@ void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 #endif
 
 //static uint8_t msg[30];
-static uint8_t msg[16];
-static size_t msglen;
+//static uint8_t msg[16];
+//static size_t msglen;
 
 static osjob_t sendjob;
 
@@ -216,12 +219,12 @@ static void sensor_measurement_tx(osjob_t* j)
     	 * set next sleep interval to min to get more sensor updates*/
 
     	//TODO: Move Sleep Interval handling to sensorDataUpdate
-    	if(isInThreshold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0 ){
+    	/*if(isInThreshold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0 ){
     		nextSleepInterval = MIN_SLEEP_INTERVAL;
     		I2C_DEVICES[currentI2C].old_val = val;
     	}
     	else{
-    		/*Increase sleep interval to next transmission to save energy */
+    		//Increase sleep interval to next transmission to save energy
       		if(nextSleepInterval < MAX_SLEEP_INTERVAL){
       			nextSleepInterval += 5;
       		}
@@ -229,12 +232,26 @@ static void sensor_measurement_tx(osjob_t* j)
       			nextSleepInterval = MAX_SLEEP_INTERVAL;
       		}
     	}
+    	*/
 
     	/* Moisture Sensor Test*/
     	//vm.int_val = val;
     	//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-    	updateSensorData();
-    	LMIC_setTxData2(1, lpp.getBuffer(), lpp.getSize(), 0);
+    	cayenne_lpp_reset(&lpp);
+    	cayenne_lpp_add_temperature(&lpp, 1, 22.5);
+    	//cayenne_lpp_add_barometric_pressure(&lpp, 2, 1072.21);
+    	//cayenne_lpp_add_relative_humidity(&lpp, 3, 425);
+    	//cayenne_lpp_add_luminosity(&lpp, 4, 300);
+    	cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
+   	    //cayenne_lpp_add_digital_input(&lpp, 1, 42);
+   	    //cayenne_lpp_add_digital_output(&lpp, 1, 123);
+   	    //cayenne_lpp_add_analog_input(&lpp, 1, 0.01);
+   	    //cayenne_lpp_add_analog_output(&lpp, 1, 0.05);
+    	//cayenne_lpp_add_presence(&lpp, 1, 1);
+    	//cayenne_lpp_add_accelerometer(&lpp, 3, 0.5, 0.42, 0.1);
+    	//cayenne_lpp_add_gyrometer(&lpp, 4, 0.3, 0.4, 0.5);
+
+    	LMIC_setTxData2(1, lpp.buffer, lpp.cursor, 0);
 		//LMIC_setTxData2(1, msg, msglen, 0);
 
     }
@@ -495,6 +512,7 @@ int main(void)
 	LMIC.dn2Dr = DR_SF9;
 
 	// Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
+	//LMIC_setDrTxpow(DR_SF7, 14);
 	LMIC_setDrTxpow(DR_SF7, 14);
 #endif
 

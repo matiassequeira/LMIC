@@ -3,4 +3,4 @@
 	url = git@github.com:AIGSG/nanopb.git
 [submodule "CayenneLPP"]
 	path = CayenneLPP
-	url = https://github.com/sabas1080/CayenneLPP.git
+	url = https://github.com/aabadie/cayenne-lpp.git

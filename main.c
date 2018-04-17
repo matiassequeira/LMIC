@@ -28,6 +28,11 @@
 #include "qm_pin_functions.h"
 #include "qm_rtc.h"
 
+//include Cayenne Low Power Payload libraries
+#include "CayenneLPP/CayenneLPP.h"
+CayenneLPP lpp(51);
+
+
 #define MIN_SLEEP_INTERVAL 	10 	//Sleep interval in seconds between sensor measurements
 #define MAX_SLEEP_INTERVAL 180
 #define VALUETHRESHOLD 0.05 //0.01 = 1 %
@@ -184,13 +189,14 @@ static void sensor_measurement_tx(osjob_t* j)
     	i++;
     }
     else {
+    	//TODO: move I2C management to updateSensorData()
     	currentI2C++;
     	if (currentI2C >= sizeof(I2C_DEVICES) / sizeof(I2C_DEVICES[0])) currentI2C = 0;
 
-    	uint16_t val;
-    	val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
+    	//uint16_t val;
+    	//val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
 
-    	printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);
+    	//printf("S%i: %i",I2C_DEVICES[currentI2C].subid, val);
 
     	/*Moisture Sensor Test output: */
     	//if(val<500){printf("\tSeco\n\r");}
@@ -201,13 +207,15 @@ static void sensor_measurement_tx(osjob_t* j)
     	//else if(val<65000){printf("\tEn agua\n\r");}
     	//else{printf("\tSin agua\n\r");}
 
-    	esl_ValueUpdate vm = esl_ValueUpdate_init_zero;
-    	vm.id = I2C_DEVICES[currentI2C].subid;
-    	vm.has_int_val = true;
+    	//esl_ValueUpdate vm = esl_ValueUpdate_init_zero;
+    	//vm.id = I2C_DEVICES[currentI2C].subid;
+    	//vm.has_int_val = true;
 
 
     	/* If sensor value changed more than stored old_val +- VALUETRESHOLD
     	 * set next sleep interval to min to get more sensor updates*/
+
+    	//TODO: Move Sleep Interval handling to sensorDataUpdate
     	if(isInThreshold(val, I2C_DEVICES[currentI2C].old_val, VALUETHRESHOLD) != 0 ){
     		nextSleepInterval = MIN_SLEEP_INTERVAL;
     		I2C_DEVICES[currentI2C].old_val = val;
@@ -223,9 +231,11 @@ static void sensor_measurement_tx(osjob_t* j)
     	}
 
     	/* Moisture Sensor Test*/
-    	vm.int_val = val;
-    	msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
-		LMIC_setTxData2(1, msg, msglen, 0);
+    	//vm.int_val = val;
+    	//msglen = esl_encode_value_update(msg, sizeof(msg), &vm);
+    	updateSensorData();
+    	LMIC_setTxData2(1, lpp.getBuffer(), lpp.getSize(), 0);
+		//LMIC_setTxData2(1, msg, msglen, 0);
 
     }
 }

@@ -30,8 +30,8 @@
 
 //include Cayenne Low Power Payload libraries
 //#include <stdio.h>
-#include "CayenneLPP/cayenne_lpp.h"
-#include "CayenneLPP/cayenne_lpp.c"
+#include "cayenne-lpp/cayenne_lpp.h"
+#include "cayenne-lpp/cayenne_lpp.c"
 
 static cayenne_lpp_t lpp;
 

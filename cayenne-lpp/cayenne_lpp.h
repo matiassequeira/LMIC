@@ -40,14 +40,59 @@ extern "C" {
 #define CAYENNE_LPP_DIGITAL_OUTPUT           (1U)   /**< 1 byte */
 #define CAYENNE_LPP_ANALOG_INPUT             (2U)   /**< 2 bytes, 0.01 signed */
 #define CAYENNE_LPP_ANALOG_OUTPUT            (3U)   /**< 2 bytes, 0.01 signed */
+#define CAYENNE_LPP_GENERIC_SENSOR	         (100U) /**< 2 bytes, unsigned */
 #define CAYENNE_LPP_LUMINOSITY               (101U) /**< 2 bytes, 1 lux unsigned */
 #define CAYENNE_LPP_PRESENCE                 (102U) /**< 1 byte, 1 */
 #define CAYENNE_LPP_TEMPERATURE              (103U) /**< 2 bytes, 0.1°C signed */
 #define CAYENNE_LPP_RELATIVE_HUMIDITY        (104U) /**< 1 byte, 0.5% unsigned */
+#define CAYENNE_LPP_POWER_MEASUREMENT        (105U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ACTUATION                (106U) /**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_SET_POINT                (108U) /**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_LOAD_CONTROL             (110U) /**< 2 bytes, 0.1% unsigned */
+#define CAYENNE_LPP_LIGHT_CONTROL            (111U) /**< 2 bytes, 0.1% unsigned */
+#define CAYENNE_LPP_POWER_CONTROL            (112U) /**< 2 bytes, 0.1% unsigned */
 #define CAYENNE_LPP_ACCELEROMETER            (113U) /**< 2 bytes per axis, 0.001G */
+#define CAYENNE_LPP_MAGNOMETER               (114U) /**< 2 bytes per axis, 0.001G */
 #define CAYENNE_LPP_BAROMETRIC_PRESSURE      (115U) /**< 2 bytes 0.1 hPa Unsigned */
+#define CAYENNE_LPP_VOLTAGE					 (116U)	/**< 2 bytes 0.1 signed */
+#define CAYENNE_LPP_CURRENT		 			 (117U)	/**< 2 bytes 0.1 signed*/
+#define CAYENNE_LPP_FREQUENCY	 			 (118U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_PERCENTAGE	 			 (120U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ALTITUDE	 			 (121U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LOAD		 			 (122U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_PRESSURE	 			 (123U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LOUDNESS	 			 (124U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CONCENTRATION 			 (125U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ACIDITY		 			 (126U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CONDUCTIVITY 			 (127U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_POWER		 			 (128U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DISTANCE	 			 (130U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ENERGY		 			 (131U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DIRECTION	 			 (132U)	/**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_TIME		 			 (133U)	/**< 4 bytes, 1 UTC unsigned */
 #define CAYENNE_LPP_GYROMETER                (134U) /**< 2 bytes per axis, 0.01 °/s */
-#define CAYENNE_LPP_GPS                      (136U) /**< 3 byte lon/lat 0.0001 °, 3 bytes alt 0.01 meter */
+#define CAYENNE_LPP_COLOUR		 			 (135U)	/**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_GPS                      (136U) /**< 3 bytes lon/lat 0.0001 °, 3 bytes alt 0.01 meter */
+#define CAYENNE_LPP_POSITIONER 				 (137U) /**< 1 byte, 1% unsigned */
+#define CAYENNE_LPP_SWITCH				 	 (142U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_LEVEL_CONTROL		 	 (143U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_UP_DOWN_CONTROL	 	 	 (143U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_PUSH_BUTTON		 		 (147U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_MULTISTATE_SELECTOR		 (148U) /**< 2 bytes, 1 unsigned */
+
+//Own definitions
+#define CAYENNE_LPP_MOISTURE		         (170U) /**< 1 byte, 0.5% unsigned */
+#define CAYENNE_LPP_SMOKE      				 (171U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ALCOHOL      			 (172U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LPG      				 (173U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CARBON_MONOXIDE    		 (174U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CARBON_DIOXIDE			 (175U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_AIR_QUALITY		 		 (176U) /**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_COLLISION      			 (177U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DUST      				 (178U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_FIRE      				 (179U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_UV      				 (180U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_BATTERY   				 (181U) /**< 1 byte, 0.5% unsigned */
 /** @} */
 
 /**
@@ -60,14 +105,59 @@ extern "C" {
 #define CAYENNE_LPP_DIGITAL_OUTPUT_SIZE      (3U)   /**< 1 byte */
 #define CAYENNE_LPP_ANALOG_INPUT_SIZE        (4U)   /**< 2 bytes, 0.01 signed */
 #define CAYENNE_LPP_ANALOG_OUTPUT_SIZE       (4U)   /**< 2 bytes, 0.01 signed */
+#define CAYENNE_LPP_GENERIC_SENSOR_SIZE		 (4U)	/**< 2 bytes */
 #define CAYENNE_LPP_LUMINOSITY_SIZE          (4U)   /**< 2 bytes, 1 lux unsigned */
 #define CAYENNE_LPP_PRESENCE_SIZE            (3U)   /**< 1 byte, 1 */
 #define CAYENNE_LPP_TEMPERATURE_SIZE         (4U)   /**< 2 bytes, 0.1°C signed */
 #define CAYENNE_LPP_RELATIVE_HUMIDITY_SIZE   (3U)   /**< 1 byte, 0.5% unsigned */
+#define CAYENNE_LPP_POWER_MEASUREMENT_SIZE	 (4U)	/**< 2 bytes 0.1 */
+#define CAYENNE_LPP_ACTUATION_SIZE			 (4U)	/**< 2 bytes 1 */
+#define CAYENNE_LPP_SET_POINT_SIZE			 (4U)	/**< 2 bytes 1 */
+#define CAYENNE_LPP_LOAD_CONTROL_SIZE		 (4U)   /**< 2 bytes, 0.1% signed */
+#define CAYENNE_LPP_LIGHT_CONTROL_SIZE		 (4U)   /**< 2 bytes, 0.1% signed */
+#define CAYENNE_LPP_POWER_CONTROL_SIZE		 (4U)   /**< 2 bytes, 0.1% signed */
 #define CAYENNE_LPP_ACCELEROMETER_SIZE       (8U)   /**< 2 bytes per axis, 0.001G */
+#define CAYENNE_LPP_MAGNOMETER_SIZE			 (8U)   /**< 2 bytes per axis, 0.001G */
 #define CAYENNE_LPP_BAROMETRIC_PRESSURE_SIZE (4U)   /**< 2 bytes 0.1 hPa Unsigned */
+#define CAYENNE_LPP_VOLTAGE_SIZE			 (4U)	/**< 2 bytes 0.1 signed */
+#define CAYENNE_LPP_CURRENT_SIZE 			 (4U)	/**< 2 bytes 0.1 signed*/
+#define CAYENNE_LPP_FREQUENCY_SIZE	 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_PERCENTAGE_SIZE	 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ALTITUDE_SIZE	 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LOAD_SIZE		 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_PRESSURE_SIZE	 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LOUDNESS_SIZE 			 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CONCENTRATION_SIZE 		 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ACIDITY_SIZE 		 	 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CONDUCTIVITY_SIZE	 	 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_POWER_SIZE			 	 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DISTANCE_SIZE		 	 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ENERGY_SIZE	 			 (4U)	/**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DIRECTION_SIZE 			 (3U)	/**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_TIME_SIZE	 			 (6U)	/**< 4 bytes, 1 UTC unsigned */
 #define CAYENNE_LPP_GYROMETER_SIZE           (8U)   /**< 2 bytes per axis, 0.01 °/s */
-#define CAYENNE_LPP_GPS_SIZE                 (11U)  /**< 3 byte lon/lat 0.0001 °, 3 bytes alt 0.01 meter */
+#define CAYENNE_LPP_COLOUR_SIZE	 			 (4U)	/**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_GPS_SIZE                 (11U)  /**< 3 bytes lon/lat 0.0001 °, 3 bytes alt 0.01 meter */
+#define CAYENNE_LPP_POSITIONER_SIZE			 (3U) /**< 1 byte, 1% unsigned */
+#define CAYENNE_LPP_SWITCH_SIZE				 (3U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_LEVEL_CONTROL_SIZE		 (3U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_UP_DOWN_CONTROL_SIZE	 (3U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_PUSH_BUTTON_SIZE		 (3U) /**< 1 byte, 1 unsigned */
+#define CAYENNE_LPP_MULTISTATE_SELECTOR_SIZE (4U) /**< 2 bytes, 1 unsigned */
+
+//Own definitions
+#define CAYENNE_LPP_MOISTURE_SIZE 		     (3U) /**< 1 byte, 0.5% unsigned */
+#define CAYENNE_LPP_SMOKE_SIZE    	 		 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_ALCOHOL_SIZE       		 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_LPG_SIZE       			 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CARBON_MONOXIDE_SIZE  	 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_CARBON_DIOXIDE_SIZE 	 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_AIR_QUALITY_SIZE 		 (4U) /**< 2 bytes, 1 unsigned */
+#define CAYENNE_LPP_COLLISION_SIZE       	 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_DUST_SIZE       		 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_FIRE_SIZE       		 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_UV_SIZE       			 (4U) /**< 2 bytes, 0.1 unsigned */
+#define CAYENNE_LPP_BATTERY_SIZE  			 (3U)   /**< 1 byte, 0.5% unsigned */
 /** @} */
 
 /**

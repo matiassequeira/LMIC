@@ -40,7 +40,8 @@ float converted_val_float;			//for analog_input, analog_output, temperature, rel
 #define MAX_SLEEP_INTERVAL		180
 #define VALUETHRESHOLD			0.05	//0.01 = 1 %
 
-uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
+//uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
+uint16_t nextSleepInterval = 20;
 
 static void rtc_sleep_callback();
 
@@ -61,11 +62,6 @@ typedef struct {
 //#define HDC1000_ADDRESS_10		(0x42)    //1000 010
 //#define HDC1000_ADDRESS_11		(0x43)    //1000 011
 
-#define CAYENNE_LPP_MOISTURE (105U)
-#define CAYENNE_LPP_CARBON_MONOXIDE (106U)
-#define CAYENNE_LPP_TOUCH (107U)
-#define CAYENNE_LPP_MICROPHONE (108U)
-
 i2c_dev_t I2C_DEVICES[] = {
 	/* Moisture Sensors test: */
 	{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }, //Moisture sensor 1 	- sensor-1
@@ -73,8 +69,8 @@ i2c_dev_t I2C_DEVICES[] = {
 
 	/* Other Sensors test: */
 	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_CARBON_MONOXIDE, .old_val = 0 }, 	//Carbon monoxide 		- sensor-3
-	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_TOUCH, .old_val = 0 }, 			//Touch sensor     		- sensor-4
-    //{ .addr = ADS1015_ADDRESS_SDA, .type = CAYENNE_LPP_MICROPHONE, .old_val = 0 }, 		//Sound sensor     		- sensor-5
+	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_PUSH_BUTTON, .old_val = 0 }, 			//Touch sensor     		- sensor-4
+    //{ .addr = ADS1015_ADDRESS_SDA, .type = CAYENNE_LPP_LOUDNESS, .old_val = 0 } 		//Sound sensor     		- sensor-5
 
 	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_TEMPERATURE, .old_val = 0 },
 	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_RELATIVE_HUMIDITY, .old_val = 0 },
@@ -215,19 +211,18 @@ void process_value(uint16_t value, uint8_t type, uint8_t channel){
 
 	case CAYENNE_LPP_CARBON_MONOXIDE:
 
-		converted_val_uint8_t = (uint8_t)(value/1000);
-		cayenne_lpp_add_carbon_monoxide(&lpp, channel, converted_val_uint8_t);
+		cayenne_lpp_add_carbon_monoxide(&lpp, channel, value);
 		break;
 
-	case CAYENNE_LPP_TOUCH:
+	case CAYENNE_LPP_PUSH_BUTTON:
 
 		converted_val_uint8_t = (uint8_t)(value/1000);
 		cayenne_lpp_add_touch(&lpp, channel, converted_val_uint8_t);
 		break;
 
-	case CAYENNE_LPP_MICROPHONE:
-		converted_val_uint8_t = (uint8_t)(value/1000);
-		cayenne_lpp_add_microphone(&lpp, channel, converted_val_uint8_t);
+	case CAYENNE_LPP_LOUDNESS:
+
+		cayenne_lpp_add_microphone(&lpp, channel, value);
 		break;
 
 	default: //TODO: print error message
@@ -256,21 +251,21 @@ static void sensor_measurement_tx(osjob_t* j)
     		//cayenne_lpp_add_moisture(&lpp, 1, converted_val);
     	}
     	//more test sensor data:
-    	process_value(22.6, CAYENNE_LPP_TEMPERATURE, 1);
-    	cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
+    	//process_value(22.6, CAYENNE_LPP_TEMPERATURE, 1);
+    	//cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
     	//cayenne_lpp_reset(&lpp);
     	//cayenne_lpp_add_temperature(&lpp, 1, 22.5);
     	//cayenne_lpp_add_barometric_pressure(&lpp, 2, 1072.21);
     	//cayenne_lpp_add_relative_humidity(&lpp, 3, 425);
-    	//cayenne_lpp_add_luminosity(&lpp, 4, 300);
+    	cayenne_lpp_add_luminosity(&lpp, 4, 300);
     	//cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
     	//cayenne_lpp_add_digital_input(&lpp, 1, 42);
     	//cayenne_lpp_add_digital_output(&lpp, 1, 123);
     	//cayenne_lpp_add_analog_input(&lpp, 1, 0.01);
     	//cayenne_lpp_add_analog_output(&lpp, 1, 0.05);
-    	//cayenne_lpp_add_presence(&lpp, 1, 1);
-    	//cayenne_lpp_add_accelerometer(&lpp, 3, 0.5, 0.42, 0.1);
-    	//cayenne_lpp_add_gyrometer(&lpp, 4, 0.3, 0.4, 0.5);
+    	cayenne_lpp_add_presence(&lpp, 1, 1);
+    	cayenne_lpp_add_accelerometer(&lpp, 3, 0.5, 0.42, 0.1);
+    	cayenne_lpp_add_gyrometer(&lpp, 4, 0.3, 0.4, 0.5);
 
     	/* If sensor value changed more than stored old_val +- VALUETRESHOLD
     	 * set next sleep interval to min to get more sensor updates*/

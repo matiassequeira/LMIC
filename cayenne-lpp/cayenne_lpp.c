@@ -209,12 +209,12 @@ void cayenne_lpp_add_moisture(cayenne_lpp_t *lpp, uint8_t channel,
 }
 
 void cayenne_lpp_add_carbon_monoxide(cayenne_lpp_t *lpp, uint8_t channel,
-                                       uint8_t value)
+                                       uint16_t value)
 {
-    if((lpp->cursor + CAYENNE_LPP_DIGITAL_INPUT_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
+    if((lpp->cursor + CAYENNE_LPP_CARBON_MONOXIDE_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
     lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_DIGITAL_INPUT;
+    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_CARBON_MONOXIDE;
     lpp->buffer[lpp->cursor++] = value;
     }
 }
@@ -222,21 +222,32 @@ void cayenne_lpp_add_carbon_monoxide(cayenne_lpp_t *lpp, uint8_t channel,
 void cayenne_lpp_add_touch(cayenne_lpp_t *lpp, uint8_t channel,
                                        uint8_t value)
 {
-    if((lpp->cursor + CAYENNE_LPP_DIGITAL_INPUT_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
+    if((lpp->cursor + CAYENNE_LPP_PUSH_BUTTON_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
     lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_DIGITAL_INPUT;
+    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_PUSH_BUTTON;
     lpp->buffer[lpp->cursor++] = value;
     }
 }
 
 void cayenne_lpp_add_microphone(cayenne_lpp_t *lpp, uint8_t channel,
-                                       uint8_t value)
+                                       uint16_t value)
 {
-    if((lpp->cursor + CAYENNE_LPP_DIGITAL_INPUT_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
+    if((lpp->cursor + CAYENNE_LPP_LOUDNESS_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
     lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_DIGITAL_INPUT;
+    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_LOUDNESS;
+    lpp->buffer[lpp->cursor++] = value;
+    }
+}
+
+void cayenne_lpp_add_battery_level(cayenne_lpp_t *lpp, uint8_t channel,
+                                       uint8_t value)
+{
+    if((lpp->cursor + CAYENNE_LPP_BATTERY_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
+
+    lpp->buffer[lpp->cursor++] = channel;
+    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_BATTERY;
     lpp->buffer[lpp->cursor++] = value;
     }
 }

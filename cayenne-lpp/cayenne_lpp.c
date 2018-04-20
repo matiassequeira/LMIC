@@ -198,10 +198,11 @@ void cayenne_lpp_add_gps(cayenne_lpp_t *lpp, uint8_t channel, float latitude,
 }
 
 void cayenne_lpp_add_moisture(cayenne_lpp_t *lpp, uint8_t channel,
-                                       uint8_t value)
+                                       float val)
 {
     if((lpp->cursor + CAYENNE_LPP_DIGITAL_INPUT_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
+    int8_t value =  val * 2;
     lpp->buffer[lpp->cursor++] = channel;
     lpp->buffer[lpp->cursor++] = CAYENNE_LPP_DIGITAL_INPUT;
     lpp->buffer[lpp->cursor++] = value;
@@ -209,13 +210,15 @@ void cayenne_lpp_add_moisture(cayenne_lpp_t *lpp, uint8_t channel,
 }
 
 void cayenne_lpp_add_carbon_monoxide(cayenne_lpp_t *lpp, uint8_t channel,
-                                       uint16_t value)
+                                       float val)
 {
     if((lpp->cursor + CAYENNE_LPP_CARBON_MONOXIDE_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
-    lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_CARBON_MONOXIDE;
-    lpp->buffer[lpp->cursor++] = value;
+    		int16_t value = val * 10;
+    	    lpp->buffer[lpp->cursor++] = channel;
+    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_TEMPERATURE;
+    	    lpp->buffer[lpp->cursor++] = value >> 8;
+    	    lpp->buffer[lpp->cursor++] = value;
     }
 }
 
@@ -231,13 +234,15 @@ void cayenne_lpp_add_touch(cayenne_lpp_t *lpp, uint8_t channel,
 }
 
 void cayenne_lpp_add_microphone(cayenne_lpp_t *lpp, uint8_t channel,
-                                       uint16_t value)
+                                       float val)
 {
     if((lpp->cursor + CAYENNE_LPP_LOUDNESS_SIZE) < CAYENNE_LPP_MAX_BUFFER_SIZE){
 
-    lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_LOUDNESS;
-    lpp->buffer[lpp->cursor++] = value;
+    	int16_t value = val * 10;
+    	    	    lpp->buffer[lpp->cursor++] = channel;
+    	    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_TEMPERATURE;
+    	    	    lpp->buffer[lpp->cursor++] = value >> 8;
+    	    	    lpp->buffer[lpp->cursor++] = value;
     }
 }
 

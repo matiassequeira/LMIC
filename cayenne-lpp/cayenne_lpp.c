@@ -204,7 +204,7 @@ void cayenne_lpp_add_moisture(cayenne_lpp_t *lpp, uint8_t channel,
 
     int8_t value =  val * 2;
     lpp->buffer[lpp->cursor++] = channel;
-    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_DIGITAL_INPUT;
+    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_MOISTURE;
     lpp->buffer[lpp->cursor++] = value;
     }
 }
@@ -216,7 +216,7 @@ void cayenne_lpp_add_carbon_monoxide(cayenne_lpp_t *lpp, uint8_t channel,
 
     		int16_t value = val * 10;
     	    lpp->buffer[lpp->cursor++] = channel;
-    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_TEMPERATURE;
+    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_CARBON_MONOXIDE;
     	    lpp->buffer[lpp->cursor++] = value >> 8;
     	    lpp->buffer[lpp->cursor++] = value;
     }
@@ -240,7 +240,7 @@ void cayenne_lpp_add_microphone(cayenne_lpp_t *lpp, uint8_t channel,
 
     	int16_t value = val * 10;
     	    	    lpp->buffer[lpp->cursor++] = channel;
-    	    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_TEMPERATURE;
+    	    	    lpp->buffer[lpp->cursor++] = CAYENNE_LPP_LOUDNESS;
     	    	    lpp->buffer[lpp->cursor++] = value >> 8;
     	    	    lpp->buffer[lpp->cursor++] = value;
     }

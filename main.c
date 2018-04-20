@@ -64,8 +64,8 @@ typedef struct {
 
 i2c_dev_t I2C_DEVICES[] = {
 	/* PS3-03FF0001: */
-	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_CARBON_MONOXIDE, .old_val = 0 }, //Moisture sensor 1 	- sensor-1
-	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }  //Moisture sensor 2 	- sensor-2
+	{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_CARBON_MONOXIDE, .old_val = 0 }, //Moisture sensor 1 	- sensor-1
+	{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }  //Moisture sensor 2 	- sensor-2
 
 	/* PS3-03FF0002: */
 	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_PUSH_BUTTON, .old_val = 0 },
@@ -78,7 +78,7 @@ i2c_dev_t I2C_DEVICES[] = {
 	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_GPS, .old_val = 0 }
 };
 
-//static uint8_t currentI2C = 0;
+static uint8_t currentI2C = 0;
 
 int setupI2C();
 
@@ -89,7 +89,7 @@ uint16_t readADS1115(uint8_t addr, uint8_t channel);
 
 #ifdef ABP
 /*Moisture Sensors test device: */
-static u4_t DEVADDR = 0x03FF0007; // <-- Change this address for every node!
+static u4_t DEVADDR = 0x03FF0008; // <-- Change this address for every node!
 /*Other Sensors test device: */
 //static u4_t DEVADDR = 0x03FF0002; // <-- Change this address for every node!
 
@@ -240,24 +240,24 @@ static void sensor_measurement_tx(osjob_t* j)
     }
     else {
 
-    	//uint16_t val;
+    	uint16_t val;
     	//float converted_val = 0;
     	cayenne_lpp_reset(&lpp);
 
-    	//for(currentI2C = 0; currentI2C < sizeof(I2C_DEVICES); currentI2C++){
+    	for(currentI2C = 0; currentI2C < sizeof(I2C_DEVICES); currentI2C++){
 
-    	//	val = 33;//readADS1115(I2C_DEVICES[currentI2C].addr, 0);
-    		//process_value(val, I2C_DEVICES[currentI2C].type, currentI2C);
-    	//}
+    		val = 33;//readADS1115(I2C_DEVICES[currentI2C].addr, 0);
+    		process_value(val, I2C_DEVICES[currentI2C].type, currentI2C);
+    	}
     	//more test sensor data:
     	//process_value(22.6, CAYENNE_LPP_TEMPERATURE, 1);
     	//cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
     	//cayenne_lpp_reset(&lpp);
-    	cayenne_lpp_add_temperature(&lpp, 0, 22.5);
+    	//cayenne_lpp_add_temperature(&lpp, 0, 22.5);
     	//cayenne_lpp_add_barometric_pressure(&lpp, 2, 1072.21);
-    	cayenne_lpp_add_relative_humidity(&lpp, 0, 425);
-    	//cayenne_lpp_add_luminosity(&lpp, 4, 300);
-    	cayenne_lpp_add_gps(&lpp, 0, -31.73304, -60.52979, 2);
+    	//cayenne_lpp_add_relative_humidity(&lpp, 0, 425);
+    	cayenne_lpp_add_luminosity(&lpp, 4, 320);
+    	//cayenne_lpp_add_gps(&lpp, 0, -31.73304, -60.52979, 2);
     	//cayenne_lpp_add_digital_input(&lpp, 1, 42);
     	//cayenne_lpp_add_digital_output(&lpp, 1, 123);
     	//cayenne_lpp_add_analog_input(&lpp, 1, 0.01);

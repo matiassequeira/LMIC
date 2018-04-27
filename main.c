@@ -1,4 +1,5 @@
-#define ABP
+//#define ABP
+#define OTAA
 #define I2C
 #define ADS1115
 
@@ -43,13 +44,14 @@ float converted_val_float;			//for analog_input, analog_output, temperature, rel
 //uint16_t nextSleepInterval = MIN_SLEEP_INTERVAL;
 uint16_t nextSleepInterval = 20;
 
-static void rtc_sleep_callback();
+//static void rtc_sleep_callback();
 
 #ifdef I2C
 
 typedef struct {
 	uint8_t addr;
 	uint8_t type;
+	uint8_t channel;
 	uint8_t old_val;
 } i2c_dev_t;
 
@@ -64,13 +66,13 @@ typedef struct {
 
 i2c_dev_t I2C_DEVICES[] = {
 	/* PS3-03FF0008: */
-	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_CARBON_MONOXIDE, .old_val = 0 }, //Moisture sensor 1 	- sensor-1
-	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }  //Moisture sensor 2 	- sensor-2
+	{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_CARBON_MONOXIDE, .old_val = 0 }, //Moisture sensor 1 	- sensor-1
+	{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }  //Moisture sensor 2 	- sensor-2
 
 	/* PS3-03FF0007: */
-	{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_PUSH_BUTTON, .old_val = 0 },
-	{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_LOUDNESS, .old_val = 0 },
-	{ .addr = ADS1015_ADDRESS_SDA, .type = CAYENNE_LPP_MOISTURE, .old_val = 0 }
+	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_PUSH_BUTTON, .channel = 0, .old_val = 0 },
+	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_LOUDNESS, .channel = 1, .old_val = 0 },
+	//{ .addr = ADS1015_ADDRESS_SDA, .type = CAYENNE_LPP_MOISTURE, .channel = 2, .old_val = 0 }
 
 	//{ .addr = ADS1015_ADDRESS_GND, .type = CAYENNE_LPP_TEMPERATURE, .old_val = 0 },
 	//{ .addr = ADS1015_ADDRESS_VCC, .type = CAYENNE_LPP_RELATIVE_HUMIDITY, .old_val = 0 },
@@ -101,11 +103,11 @@ static u1_t APPSKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB
 // first. When copying an EUI from ttnctl output, this means to reverse
 // the bytes. For TTN issued EUIs the last bytes should be 0xD5, 0xB3,
 // 0x70.
-static const u1_t APPEUI[8]={ 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 };
+static const u1_t APPEUI[8]={ 0xC4, 0x00, 0x00, 0x00, 0x00, 0x85, 0x00, 0x00 };
 void os_getArtEui (u1_t* buf) { memcpy(buf, APPEUI, 8); }
 
 // This should also be in little endian format, see above.
-static const u1_t DEVEUI[8]={ 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
+static const u1_t DEVEUI[8]={ 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 void os_getDevEui (u1_t* buf) { memcpy(buf, DEVEUI, 8); }
 
 // This key should be in big endian format (or, since it is not really a
@@ -113,7 +115,7 @@ void os_getDevEui (u1_t* buf) { memcpy(buf, DEVEUI, 8); }
 // practice, a key taken from ttnctl can be copied as-is.
 // The key shown here is the semtech default key.
 //static const u1_t APPKEY[16] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 };
-static const u1_t APPKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
+static const u1_t APPKEY[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x59 };
 void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 #endif
 
@@ -122,6 +124,11 @@ void os_getDevKey (u1_t* buf) { memcpy(buf, APPKEY, 16); }
 //static size_t msglen;
 
 static osjob_t sendjob;
+
+u4_t netid = 0;
+devaddr_t devaddr = 0;
+u1_t nwkKey [16];
+u1_t artKey [16];
 
 // Schedule TX every this many seconds (might become longer due to duty
 // cycle limitations).
@@ -144,19 +151,19 @@ int isInThreshold(int value, int test_val, float threshold){
 	}
 }
 
-static void rtc_sleep_wakeup(uint16_t sleep_interval)
+/*static void rtc_sleep_wakeup(uint16_t sleep_interval)
 {
 	qm_rtc_config_t rtc_cfg;
 	clk_periph_enable(CLK_PERIPH_RTC_REGISTER | CLK_PERIPH_CLK);
 
-	/*
-	 * Setup the RTC to get out of sleep mode. Deep sleep will require an
-	 * analog comparator interrupt to wake up the system.
-	 */
+
+	 // Setup the RTC to get out of sleep mode. Deep sleep will require an
+	 // analog comparator interrupt to wake up the system.
+	 //
 	rtc_cfg.init_val = 0;
 	rtc_cfg.alarm_en = 1;
 	rtc_cfg.alarm_val = QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1);
-	/* after sleep interval schedule next sensor mediation */
+	// after sleep interval schedule next sensor mediation
 	rtc_cfg.callback = rtc_sleep_callback;
 	rtc_cfg.callback_data = NULL;
 	rtc_cfg.prescaler = CLK_RTC_DIV_1;
@@ -167,18 +174,18 @@ static void rtc_sleep_wakeup(uint16_t sleep_interval)
 	QM_IRQ_REQUEST(QM_IRQ_RTC_0_INT, qm_rtc_0_isr);
 
 	QM_PUTS("CPU Halt.");
-	/* Halt the CPU, RTC alarm will wake. */
+	// Halt the CPU, RTC alarm will wake.
 	qm_power_cpu_halt();
 	QM_PUTS("CPU Halt wakeup.");
 
-	/* Setup wake up isr for RTC. */
+	// Setup wake up isr for RTC.
 	QM_IRQ_REQUEST(QM_IRQ_RTC_0_INT, qm_rtc_0_isr);
 
-	/* Set another alarm one second from now. */
+	// Set another alarm one second from now.
 	qm_rtc_set_alarm(QM_RTC_0, QM_RTC[QM_RTC_0]->rtc_ccvr +
 				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1));
 	QM_PUTS("Go to sleep.");
-	/* Go to sleep, RTC will wake. */
+	// Go to sleep, RTC will wake.
 	qm_power_soc_sleep();
 	QM_PUTS("Wake up from sleep.");
 
@@ -186,7 +193,7 @@ static void rtc_sleep_wakeup(uint16_t sleep_interval)
 	qm_rtc_set_alarm(QM_RTC_0, QM_RTC[QM_RTC_0]->rtc_ccvr +
 				       QM_RTC_ALARM_SECOND(CLK_RTC_DIV_1) * sleep_interval);
 	qm_power_soc_deep_sleep(QM_POWER_WAKE_FROM_RTC);
-}
+}*/
 /*
  * Function to process initial 16 bit sensor value received from ADC into smaller readable format to transmit as Cayenne LPP
  */
@@ -247,17 +254,17 @@ static void sensor_measurement_tx(osjob_t* j)
     	for(currentI2C = 0; currentI2C < sizeof(I2C_DEVICES); currentI2C++){
 
     		val = readADS1115(I2C_DEVICES[currentI2C].addr, 0);
-    		process_value(val, I2C_DEVICES[currentI2C].type, currentI2C);
+    		process_value(val, I2C_DEVICES[currentI2C].type, I2C_DEVICES[currentI2C].channel);
     	}
     	//more test sensor data:
     	//process_value(22.6, CAYENNE_LPP_TEMPERATURE, 1);
     	//cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
     	//cayenne_lpp_reset(&lpp);
-    	//cayenne_lpp_add_temperature(&lpp, 0, 22.5);
+    	cayenne_lpp_add_temperature(&lpp, 0, 22.5);
     	//cayenne_lpp_add_barometric_pressure(&lpp, 2, 1072.21);
-    	//cayenne_lpp_add_relative_humidity(&lpp, 0, 425);
-    	//cayenne_lpp_add_luminosity(&lpp, 4, 320);
-    	cayenne_lpp_add_gps(&lpp, 0, -31.73304, -60.52979, 2);
+    	cayenne_lpp_add_relative_humidity(&lpp, 0, 425);
+    	cayenne_lpp_add_luminosity(&lpp, 4, 320);
+    	//cayenne_lpp_add_gps(&lpp, 5, -31.73304, -60.52979, 2);
     	//cayenne_lpp_add_digital_input(&lpp, 1, 42);
     	//cayenne_lpp_add_digital_output(&lpp, 1, 123);
     	//cayenne_lpp_add_analog_input(&lpp, 1, 0.01);
@@ -289,12 +296,12 @@ static void sensor_measurement_tx(osjob_t* j)
     }
 }
 
-void rtc_sleep_callback(){
+/*void rtc_sleep_callback(){
 	qm_power_soc_restore();
 	printf("good morning!");
 	// Schedule next transmission
 	os_setTimedCallback(&sendjob, os_getTime(), sensor_measurement_tx);
-}
+}*/
 
 void onEvent (ev_t ev)
 {
@@ -322,6 +329,7 @@ void onEvent (ev_t ev)
 		// Disable link check validation (automatically enabled
 		// during join, but not supported by TTN at this time).
 		LMIC_setLinkCheckMode(0);
+		//LMIC_getSessionKeys (&netid, &devaddr, nwkKey, artKey);
 		break;
 	case EV_RFU1:
 		// Serial.println(F("EV_RFU1"));
@@ -365,7 +373,8 @@ void onEvent (ev_t ev)
 			}
 		}
 		/* Set up the RTC to wake up the SoC from sleep and put board to sleep mode. */
-		rtc_sleep_wakeup(nextSleepInterval);
+		//rtc_sleep_wakeup(nextSleepInterval);
+		os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(nextSleepInterval), sensor_measurement_tx);
 		break;
 	case EV_LOST_TSYNC:
 		// Serial.println(F("EV_LOST_TSYNC"));
@@ -547,13 +556,28 @@ int main(void)
 	//LMIC_setDrTxpow(DR_SF7, 14);
 	LMIC_setDrTxpow(DR_SF7, 14);
 #endif
+#ifdef OTAA
+	//by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
+	for(int channel = 8; channel < 72; channel++){
+		LMIC_disableChannel(channel);
+	}
+	LMIC_enableChannel(70);
 
-	 //by default all 72 channels are enabled, so disable all channels which the gateway isn´t listen to (8 to 72)
-	 //   for(int channel = 8; channel < 72; channel++){
-	 //  	LMIC_disableChannel(channel);
-	 //   }
+	// Disable data rate adaptation
+	LMIC_setAdrMode(0);
+	// Disable link check validation
+	LMIC_setLinkCheckMode(0);
 
-    LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
+	LMIC_setClockError(MAX_CLOCK_ERROR * 1 / 100);
+	// TTN uses SF9 for its RX2 window.
+	LMIC.dn2Dr = DR_SF9;
+
+	// Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
+	//LMIC_setDrTxpow(DR_SF7, 14);
+	LMIC_setDrTxpow(DR_SF9, 14);
+	LMIC_setClockError( MAX_CLOCK_ERROR * 1 / 100);
+	//LMIC_startJoining();
+#endif
 
     // Start job (sending automatically starts OTAA too)
     sensor_measurement_tx(&sendjob);
